@@ -479,6 +479,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                         position: "absolute",
                                         backgroundColor: "white",
                                         borderRadius: 15,
+                                        overflow: "hidden",
 
                                         // width: this.state.backdropWidth / 2,
                                         // height: this.state.backdropHeight / 2,
