@@ -6,21 +6,46 @@ import SafePopover from 'react-native-safe-popover';
 function MySafeAreaConsumer() {
   const insets = useSafeArea();
   const [popupVisible, setPopupVisible] = React.useState(false);
+  const [lastClickedTarget, setLastClickedTarget] = React.useState<React.RefObject<View>|null>(null);
   const targetRef = React.useRef(null);
+  const unsafeTopRef = React.useRef(null);
+  const unsafeBottomRef = React.useRef(null);
+  const unsafeLeftRef = React.useRef(null);
+  const unsafeRightRef = React.useRef(null);
 
   const onUnsafeAreaPress = (event: GestureResponderEvent, whichInset: "top"|"left"|"bottom"|"right") => {
     console.log(`[onUnsafeAreaPress] ${whichInset}`);
     const { } = event.nativeEvent;
+
+    switch(whichInset){
+      case "bottom":
+        setLastClickedTarget(unsafeBottomRef);
+        break;
+      case "top":
+        setLastClickedTarget(unsafeTopRef);
+        break;
+      case "left":
+        setLastClickedTarget(unsafeLeftRef);
+        break;
+      case "right":
+        setLastClickedTarget(unsafeRightRef);
+        break;
+    }
+
+    setPopupVisible(true);
   };
 
   const onSafeAreaPress = (event: GestureResponderEvent) => {
     console.log(`[onsafeAreaPress]`);
     const { } = event.nativeEvent;
+    // setLastClickedTarget(targetRef);
+    // setPopupVisible(true);
   };
 
   const onHitboxPress = (event: GestureResponderEvent) => {
-    console.log("onHitboxPress");
+    console.log("[onHitboxPress]");
     const { } = event.nativeEvent;
+    setLastClickedTarget(targetRef);
     setPopupVisible(true);
   };
 
@@ -32,6 +57,7 @@ function MySafeAreaConsumer() {
     <View style={styles.container}>
       <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "top")}>
         <View
+          ref={unsafeTopRef}
           style={[
             styles.unsafeVertical,
             {
@@ -45,6 +71,7 @@ function MySafeAreaConsumer() {
       <View style={styles.centralRow}>
         <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "left")}>
           <View
+            ref={unsafeLeftRef}
             style={[
               styles.unsafeHorizontal,
               {
@@ -66,11 +93,11 @@ function MySafeAreaConsumer() {
             ]}
           >
             <TouchableWithoutFeedback onPress={onHitboxPress}>
-              <View ref={targetRef} style={styles.target}></View>
+              <View ref={targetRef} style={[styles.target]}></View>
             </TouchableWithoutFeedback>
 
             <SafePopover
-              sourceView={targetRef}
+              sourceView={lastClickedTarget!}
               modalVisible={popupVisible}
               dismissModalOnBackdropPress={onBackdropPress}
               canOverlapSourceViewRect={false}
@@ -82,6 +109,7 @@ function MySafeAreaConsumer() {
 
         <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "right")}>
           <View
+            ref={unsafeRightRef}
             style={[
               styles.unsafeHorizontal,
               {
@@ -95,6 +123,7 @@ function MySafeAreaConsumer() {
 
       <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "bottom")}>
         <View
+          ref={unsafeBottomRef}
           style={[
             styles.unsafeVertical,
             {
@@ -144,8 +173,8 @@ const styles = StyleSheet.create({
   },
   target: {
     backgroundColor: "blue",
-    width: 20,
-    height: 20,
+    width: 90,
+    height: 90,
   },
   container: {
     flex: 1,
