@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Modal, NativeSyntheticEvent, LayoutChangeEvent, StyleSheet } from 'react-native';
-import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets, useSafeArea, SafeAreaContext } from 'react-native-safe-area-context';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Triangle } from './Triangle';
 
@@ -175,7 +175,10 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
     //     this.setState({ modalVisible }, callback);
     // };
 
-    private readonly onLayout = (e: LayoutChangeEvent) => {
+    /**
+     * This event races against the edgeInsets updates. I've seen edgeInsets update after this.
+     */
+    private readonly onLayout = (e: LayoutChangeEvent, edgeInsets: EdgeInsets) => {
         /**
          * The "layout" event gives the latest dimensions of the backdrop, which equal those of the modal,
          * which is full-screen, and so these measurements can reflect the window dimensions.
@@ -192,7 +195,20 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
              */
             this.props.sourceView?.current.measureInWindow(
                 (x: number, y: number, width: number, height: number) => {
-                    console.log(`[Popover.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}`);
+                    console.log(`[Popover.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}\n- edgeInsets: ${JSON.stringify(edgeInsets)}`);
+
+                    /* Need to somehow get edgeInsets */
+                    // const popoverLayout = this.calculatePopoverLayout(
+                    //     PopoverArrowDirection.down,
+                    //     edgeInsets,
+                    //     {
+                    //         x,
+                    //         y,
+                    //         width,
+                    //         height,
+                    //     }
+                    // );
+
                     this.setState({
                         backdropWidth: layout.width,
                         backdropHeight: layout.height,
@@ -386,6 +402,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
         return (
             <SafeAreaConsumer>
                 {(edgeInsets: EdgeInsets|null) => {
+                    console.log(`[edgeInsets]`, edgeInsets);
                     const {
                         permittedArrowDirections = [],
                         children,
@@ -450,7 +467,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                     width: "100%",
                                     height: "100%",
                                 }}
-                                onLayout={this.onLayout}
+                                onLayout={(event) => this.onLayout(event, edgeInsets!)}
                             >
                                 {/* Popover */}
                                 <View
