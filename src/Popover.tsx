@@ -192,8 +192,12 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
             /**
              * The values returned by measureInWindow give the position of the source view within the window,
              * so they are effectively relative to the dimensions of the "layout" event above.
+             * 
+             * BUG: If you call measureInWindow() immediately upon onLayout(), the dimensions may be off by ~25 pixels.
+             * I think this is because the safe area is updating bit-by-bit upon orientation change.
+             * Waiting 75 milliseconds solves this bug, but makes the popup glitchier in other use-cases.
              */
-            this.props.sourceView?.current.measureInWindow(
+            this.props.sourceView?.current?.measureInWindow(
                 (x: number, y: number, width: number, height: number) => {
                     console.log(`[Popover.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}\n- edgeInsets: ${JSON.stringify(edgeInsets)}`);
 
@@ -221,7 +225,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                         console.log(`[Popover.onLayout] measureInWindow setState complete`);
                     });
                 }
-            )
+            );
         } else {
             console.log(`[Popover.onLayout] One or more refs were missing.`);
             this.setState({
