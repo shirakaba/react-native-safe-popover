@@ -428,6 +428,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                             visible={this.props.modalVisible}
                             onRequestClose={this.onRequestClose}
                             onShow={this.onShow}
+                            supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}
                         >
                             {/* Backdrop */}
                             <TouchableWithoutFeedback
