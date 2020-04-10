@@ -176,27 +176,38 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
     // };
 
     private readonly onLayout = (e: LayoutChangeEvent) => {
-        // We have to clone it because events are pooled (re-used) in React.
+        /**
+         * The "layout" event gives the latest dimensions of the backdrop, which equal those of the modal,
+         * which is full-screen, and so these measurements can reflect the window dimensions.
+         * 
+         * We have to clone the event because events are pooled (re-used) in React.
+         */
         const layout = { ...e.nativeEvent.layout };
         
         if(this.props.sourceView?.current && this.backdropRef.current){
+            console.log(`[Popover.onLayout] got both refs. Measuring...`);
+            /**
+             * The values returned by measureInWindow give the position of the source view within the window,
+             * so they are effectively relative to the dimensions of the "layout" event above.
+             */
             this.props.sourceView?.current.measureInWindow(
-                (left: number, top: number, width: number, height: number) => {
-                    console.log(`[Popover.onLayout] measureInWindow beginning setState`);
+                (x: number, y: number, width: number, height: number) => {
+                    console.log(`[Popover.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}`);
                     this.setState({
                         backdropWidth: layout.width,
                         backdropHeight: layout.height,
 
                         sourceRectHeight: height,
                         sourceRectWidth: width,
-                        sourceRectX: left,
-                        sourceRectY: top,
+                        sourceRectX: x,
+                        sourceRectY: y,
                     }, () => {
                         console.log(`[Popover.onLayout] measureInWindow setState complete`);
                     });
                 }
             )
         } else {
+            console.log(`[Popover.onLayout] One or more refs were missing.`);
             this.setState({
                 backdropWidth: layout.width,
                 backdropHeight: layout.height,
