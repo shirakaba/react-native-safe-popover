@@ -374,7 +374,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
     render(){
         return (
             <SafeAreaConsumer>
-                {(edgeInsets: EdgeInsets) => {
+                {(edgeInsets: EdgeInsets|null) => {
                     const {
                         permittedArrowDirections = [],
                         children,
@@ -387,8 +387,8 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                     // ==ASSUMPTIONS==
                     // 1) We're using Modal, so the backdrop and the screen are exactly the same.
                     // 2) Thus, the screen's safe area insets equally apply to the backdrop.
-                    const safeAreaWidth: number = backdropWidth - edgeInsets.left - edgeInsets.right;
-                    const safeAreaHeight: number = backdropHeight - edgeInsets.top - edgeInsets.bottom;
+                    const safeAreaWidth: number = backdropWidth - edgeInsets!.left - edgeInsets!.right;
+                    const safeAreaHeight: number = backdropHeight - edgeInsets!.top - edgeInsets!.bottom;
 
                     // TODO: allow defining edge insets in addition to the implicit safe area insets.
 
@@ -401,9 +401,10 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
 
                     console.log(`Got sourceRect`, sourceRect);
 
+                    // TODO: strict typing
                     const popoverLayout = this.calculatePopoverLayout(
                         PopoverArrowDirection.down,
-                        edgeInsets,
+                        edgeInsets!,
                         {
                             // x: 300,
                             // y: 700,
@@ -413,7 +414,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                             ...sourceRect,
                         }
                     );
-                    console.log(`Got popoverLayout.popover:`, popoverLayout.popover);
+                    console.log(`Got popoverLayout.popover:`, popoverLayout!.popover);
 
                     // let arrowDirectionToUse: PopoverArrowDirection;
                     // if(permittedArrowDirections.some(dir => dir === PopoverArrowDirection.down)){
