@@ -488,22 +488,23 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                         width: popoverLayout?.popover?.width ?? 0,
                                         height: popoverLayout?.popover?.height ?? 0,
                                     }}
+                                    
                                 >
                                     {children}
                                 </View>
-                                <Triangle
-                                    style={{
-                                        position: "absolute",
-
-                                        left: popoverLayout?.arrow?.x ?? 0,
-                                        top: popoverLayout?.arrow?.y ?? 0,
-                                    }}
-                                    width={popoverLayout?.arrow?.width ?? 0}
-                                    height={popoverLayout?.arrow?.height ?? 0}
-                                    color={"white"}
-                                    direction={"down"}
-                                />
                             </TouchableWithoutFeedback>
+                            <Triangle
+                                style={{
+                                    position: "absolute",
+
+                                    left: popoverLayout?.arrow?.x ?? 0,
+                                    top: popoverLayout?.arrow?.y ?? 0,
+                                }}
+                                width={popoverLayout?.arrow?.width ?? 0}
+                                height={popoverLayout?.arrow?.height ?? 0}
+                                color={"white"}
+                                direction={"down"}
+                            />
                         </Modal>
                     );
                 }}
