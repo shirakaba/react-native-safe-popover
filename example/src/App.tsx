@@ -8,7 +8,18 @@ function MySafeAreaConsumer() {
   const [popupVisible, setPopupVisible] = React.useState(false);
   const targetRef = React.useRef(null);
 
+  const onUnsafeAreaPress = (event: GestureResponderEvent, whichInset: "top"|"left"|"bottom"|"right") => {
+    console.log(`[onUnsafeAreaPress] ${whichInset}`);
+    const { } = event.nativeEvent;
+  };
+
+  const onSafeAreaPress = (event: GestureResponderEvent) => {
+    console.log(`[onsafeAreaPress]`);
+    const { } = event.nativeEvent;
+  };
+
   const onHitboxPress = (event: GestureResponderEvent) => {
+    console.log("onHitboxPress");
     const { } = event.nativeEvent;
     setPopupVisible(true);
   };
@@ -19,71 +30,80 @@ function MySafeAreaConsumer() {
 
   return (
     <View style={styles.container}>
-      <View
-        style={[
-          styles.unsafeVertical,
-          {
-            height: insets.top,
-          },
-        ]}
-      >
-      </View>
-      <View style={styles.centralRow}>
+      <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "top")}>
         <View
           style={[
-            styles.unsafeHorizontal,
+            styles.unsafeVertical,
             {
-              width: insets.left,
+              height: insets.top,
             },
           ]}
         >
         </View>
-        <View
-          style={[
-            styles.safe,
-            {
-            },
-          ]}
-        >
-          <Text>Heya</Text>
-        </View>
-        <View
-          style={[
-            styles.unsafeHorizontal,
-            {
-              width: insets.right,
-            },
-          ]}
-        >
-        </View>
-      </View>
-
-      <View
-        style={[
-          styles.unsafeVertical,
-          {
-            height: insets.bottom,
-          },
-        ]}
-      >
-      </View>
-      
-
-      {/* <TouchableWithoutFeedback onPress={onHitboxPress}>
-        <View ref={targetRef} style={styles.target}></View>
       </TouchableWithoutFeedback>
-      <Text>Lorem ipsum</Text>
 
-      <SafePopover
-        sourceView={targetRef}
-        modalVisible={popupVisible}
-        dismissModalOnBackdropPress={onBackdropPress}
-        canOverlapSourceViewRect={false}
-      >
-        <Text>I'm the content of this popover!</Text>
-      </SafePopover> */}
+      <View style={styles.centralRow}>
+        <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "left")}>
+          <View
+            style={[
+              styles.unsafeHorizontal,
+              {
+                width: insets.left,
+              },
+            ]}
+          >
+          </View>
+        </TouchableWithoutFeedback>
 
+        <TouchableWithoutFeedback onPress={(event) => onSafeAreaPress(event)}>
+          <View
+            style={[
+              styles.safe,
+              {
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+          >
+            <TouchableWithoutFeedback onPress={onHitboxPress}>
+              <View ref={targetRef} style={styles.target}></View>
+            </TouchableWithoutFeedback>
 
+            <SafePopover
+              sourceView={targetRef}
+              modalVisible={popupVisible}
+              dismissModalOnBackdropPress={onBackdropPress}
+              canOverlapSourceViewRect={false}
+            >
+              <Text>I'm the content of this popover!</Text>
+            </SafePopover>
+          </View>
+        </TouchableWithoutFeedback>
+
+        <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "right")}>
+          <View
+            style={[
+              styles.unsafeHorizontal,
+              {
+                width: insets.right,
+              },
+            ]}
+          >
+          </View>
+        </TouchableWithoutFeedback>
+      </View>
+
+      <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "bottom")}>
+        <View
+          style={[
+            styles.unsafeVertical,
+            {
+              height: insets.bottom,
+            },
+          ]}
+        >
+        </View>
+      </TouchableWithoutFeedback>
     </View>
   );
 }
