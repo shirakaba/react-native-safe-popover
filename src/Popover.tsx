@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Modal, NativeSyntheticEvent, LayoutChangeEvent, StyleSheet } from 'react-native';
+import { View, Modal, NativeSyntheticEvent, LayoutChangeEvent, StyleSheet, GestureResponderEvent } from 'react-native';
 import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets, useSafeArea, SafeAreaContext } from 'react-native-safe-area-context';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Triangle } from './Triangle';
@@ -396,7 +396,9 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
         return null;
     };
 
-    private readonly onBackdropPress = () => {
+    private readonly onBackdropPress = (event: GestureResponderEvent) => {
+        console.log(`[onBackdropPress]`);
+
         if(this.props.dismissModalOnBackdropPress){
             this.props.dismissModalOnBackdropPress();
         }
