@@ -1,9 +1,12 @@
-import { NativeModules } from 'react-native';
+// import { NativeModules } from 'react-native';
+// type SafePopoverType = {
+//   getDeviceName(): Promise<string>;
+// };
 
-type SafePopoverType = {
-  getDeviceName(): Promise<string>;
-};
+// const { SafePopover } = NativeModules;
 
-const { SafePopover } = NativeModules;
+// export default SafePopover as SafePopoverType;
 
-export default SafePopover as SafePopoverType;
+import { Popover } from "./Popover";
+
+export default Popover;

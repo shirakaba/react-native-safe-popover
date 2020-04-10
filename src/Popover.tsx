@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Modal, NativeSyntheticEvent, LayoutChangeEvent, StyleSheet } from 'react-native';
-import { SafeAreaConsumer, EdgeInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets } from 'react-native-safe-area-context';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Triangle } from './Triangle';
 
