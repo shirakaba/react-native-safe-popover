@@ -464,80 +464,50 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                             onShow={this.onShow}
                             supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}
                         >
+                            {/* Backdrop */}
                             <TouchableWithoutFeedback
+                                ref={this.backdropRef}
                                 onPress={this.onBackdropPress}
+                                style={{
+                                    backgroundColor: "rgba(0,0,0,0.25)",
+                                    width: "100%",
+                                    height: "100%",
+                                }}
+                                onLayout={(event) => this.onLayout(event, edgeInsets!)}
                             >
-                                {/* Backdrop */}
+                                {/* Popover */}
                                 <View
-                                    ref={this.backdropRef}
                                     style={{
-                                        position: "relative",
-                                        backgroundColor: "rgba(0,0,0,0.25)",
-                                        width: "100%",
-                                        height: "100%",
+                                        position: "absolute",
+                                        backgroundColor: "white",
+                                        borderRadius: 15,
+                                        overflow: "hidden",
+
+                                        // width: this.state.backdropWidth / 2,
+                                        // height: this.state.backdropHeight / 2,
+
+                                        left: popoverLayout?.popover?.x ?? 0,
+                                        top: popoverLayout?.popover?.y ?? 0,
+                                        width: popoverLayout?.popover?.width ?? 0,
+                                        height: popoverLayout?.popover?.height ?? 0,
                                     }}
-                                    onLayout={(event) => this.onLayout(event, edgeInsets!)}
+                                    
                                 >
-                                    <TouchableWithoutFeedback
-                                        // onPress={() => {}}
-                                        style={{
-                                            position: "relative",
-                                            backgroundColor: "purple",
-                                            borderRadius: 15,
-                                            overflow: "hidden",
-
-                                            left: popoverLayout?.popover?.x ?? 0,
-                                            top: popoverLayout?.popover?.y ?? 0, // seems to be relative to... 
-
-                                            width: (popoverLayout?.popover?.width! ?? 0),
-                                            height: (popoverLayout?.popover?.height! ?? 0) + (popoverLayout?.popover?.y ?? 0),
-                                            // width: popoverLayout?.popover?.width ?? 0,
-                                            // height: popoverLayout?.popover?.height ?? 0,
-                                        }}
-                                    >
-                                        {/* Popover */}
-                                        <View
-                                            style={{
-                                                position: "relative",
-                                                backgroundColor: "white",
-                                                borderRadius: 15,
-                                                overflow: "hidden",
-
-                                                // width: this.state.backdropWidth / 2,
-                                                // height: this.state.backdropHeight / 2,
-
-                                                // left: popoverLayout?.popover?.x ?? 0,
-                                                // top: popoverLayout?.popover?.y ?? 0,
-                                                width: popoverLayout?.popover?.width! ?? 0,
-                                                height: popoverLayout?.popover?.height! ?? 0,
-
-                                                // left: 57, // left cannot exceed width
-                                                // top: 200, // top cannot exceed height anymore
-                                                // width: 200,
-                                                // height: 250,
-
-                                                // width: "100%",
-                                                // height: "100%",
-                                            }}
-                                            
-                                        >
-                                            {children}
-                                        </View>
-                                        {/* <Triangle
-                                            style={{
-                                                position: "absolute",
-
-                                                left: popoverLayout?.arrow?.x ?? 0,
-                                                top: popoverLayout?.arrow?.y ?? 0,
-                                            }}
-                                            width={popoverLayout?.arrow?.width ?? 0}
-                                            height={popoverLayout?.arrow?.height ?? 0}
-                                            color={"white"}
-                                            direction={"down"}
-                                        /> */}
-                                    </TouchableWithoutFeedback>
+                                    {children}
                                 </View>
                             </TouchableWithoutFeedback>
+                            <Triangle
+                                style={{
+                                    position: "absolute",
+
+                                    left: popoverLayout?.arrow?.x ?? 0,
+                                    top: popoverLayout?.arrow?.y ?? 0,
+                                }}
+                                width={popoverLayout?.arrow?.width ?? 0}
+                                height={popoverLayout?.arrow?.height ?? 0}
+                                color={"white"}
+                                direction={"down"}
+                            />
                         </Modal>
                     );
                 }}
