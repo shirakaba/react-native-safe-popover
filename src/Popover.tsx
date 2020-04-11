@@ -560,6 +560,83 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
         };
     }
 
+    private calculatePopoverLayoutForArrowDirectionLeft(
+        sourceRectClippedMidpoint: { readonly x: number; readonly y: number; },
+        backdropWidth: number,
+        safeAreaEdgeInsets: EdgeInsets,
+        sourceRectClipped: { readonly x: number; readonly y: number; readonly width: number; readonly height: number; },
+        backdropHeight: number,
+    ): PopoverLayout|null {
+        const arrowPoint = {
+            x: Math.max(
+                Math.min(
+                    sourceRectClippedMidpoint.x - Popover.arrowBreadth / 2,
+                    backdropWidth - safeAreaEdgeInsets.right - Popover.arrowBreadth
+                ),
+                safeAreaEdgeInsets.left
+            ),
+            y: Math.max(
+                Math.min(
+                    sourceRectClipped.y + sourceRectClipped.height,
+                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.arrowLength
+                ),
+                safeAreaEdgeInsets.top
+            ),
+        } as const;
+
+        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
+        const preferredY: number = arrowPoint.y + Popover.arrowLength;
+
+        const popoverOrigin = {
+            x: Math.max(
+                preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
+                    preferredX :
+                    backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
+                safeAreaEdgeInsets.left
+            ),
+            y: Math.min(
+                preferredY,
+                backdropHeight - safeAreaEdgeInsets.bottom
+            ),
+        };
+
+        const popoverSize = {
+            width: Math.min(
+                backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
+                Popover.preferredWidth
+            ),
+            height: Math.min(
+                (backdropHeight - safeAreaEdgeInsets.bottom) - preferredY,
+                Popover.preferredHeight
+            ),
+        };
+
+        const borderTopLeftRadius: number = arrowPoint.x <= popoverOrigin.x + Popover.cornerWidth ?
+            0 :
+            Popover.borderRadius;
+        const borderTopRightRadius: number = arrowPoint.x >= popoverOrigin.x + popoverSize.width - Popover.cornerWidth ?
+            0 :
+            Popover.borderRadius;
+
+        return {
+            arrow: {
+                ...arrowPoint,
+                width: Popover.arrowBreadth,
+                height: Popover.arrowLength,
+            },
+            popover: {
+                ...popoverOrigin,
+                ...popoverSize,
+                borderRadii: {
+                    borderTopRightRadius,
+                    borderTopLeftRadius,
+                    borderBottomLeftRadius: Popover.borderRadius,
+                    borderBottomRightRadius: Popover.borderRadius,
+                },
+            },
+        };
+    }
+
     render(){
         return (
             <SafeAreaConsumer>
