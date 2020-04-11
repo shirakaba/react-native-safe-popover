@@ -678,7 +678,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                 width={popoverLayout?.arrow?.width ?? 0}
                                 height={popoverLayout?.arrow?.height ?? 0}
                                 color={"white"}
-                                direction={"down"}
+                                direction={"up"}
                             />
                         </Modal>
                     );
