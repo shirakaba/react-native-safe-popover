@@ -73,6 +73,22 @@ export interface PopoverProps {
      * @default false
      */
     preferPopoverToCoverLeftSideWhenArrowIsHorizontal?: boolean,
+
+    /**
+     * The margins that define the portion of the screen in which it is permissible to display the popover.
+     * 
+     * In the original UIPopoverPresentationController, these would default to 10 points from each edge, and
+     * the status bar height would also be implicitly subtracted as well.
+     * 
+     * In my implementation, the popover strictly occupies the safe area to begin with. So this prop will
+     * instead be interpreted as the minimum inset from each edge (mainly so that you can enforce left and
+     * right edge insets even when the left and right sides are totally within the safe area).
+     * 
+     * @default { top: 10, left: 10, right: 10, bottom: 10 }
+     * 
+     * @see https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller/1622323-popoverlayoutmargins?language=objc
+     */
+    popoverMinimumLayoutMargins?: EdgeInsets,
 }
 
 interface PopoverState {
@@ -109,6 +125,15 @@ interface PopoverState {
 }
 
 export class Popover extends React.Component<PopoverProps, PopoverState> {
+    public static defaultProps = {
+        popoverMinimumLayoutMargins: {
+            top: 10,
+            left: 10,
+            right: 10,
+            bottom: 10,
+        },
+    };
+
     /**
      * When the popover is onscreen, this property reflects the actual arrow direction.
      * Before and after presentation, the value of this property is unknown.
@@ -455,6 +480,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                     const {
                         permittedArrowDirections = [],
                         children,
+                        popoverMinimumLayoutMargins,
                     } = this.props;
                     const {
                         backdropHeight,
@@ -481,7 +507,12 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                     // TODO: strict typing
                     const popoverLayout = this.calculatePopoverLayout(
                         PopoverArrowDirection.down,
-                        edgeInsets!,
+                        {
+                            left: Math.max(edgeInsets?.left ?? 0, popoverMinimumLayoutMargins?.left ?? 0),
+                            top: Math.max(edgeInsets?.top ?? 0, popoverMinimumLayoutMargins?.top ?? 0),
+                            bottom: Math.max(edgeInsets?.bottom ?? 0, popoverMinimumLayoutMargins?.bottom ?? 0),
+                            right: Math.max(edgeInsets?.right ?? 0, popoverMinimumLayoutMargins?.right ?? 0),
+                        },
                         {
                             // x: 300,
                             // y: 700,
