@@ -377,6 +377,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
             // └───────────────────┘
             
         } else if(arrowDirection === PopoverArrowDirection.up){ 
+            return this.calculatePopoverLayoutForArrowDirectionUp(sourceRectClippedMidpoint, backdropWidth, safeAreaEdgeInsets, sourceRectClipped, backdropHeight);
             //   █
             // ┌-^-┐
             // │   │
@@ -406,6 +407,83 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
     };
 
     private calculatePopoverLayoutForArrowDirectionDown(
+        sourceRectClippedMidpoint: { readonly x: number; readonly y: number; },
+        backdropWidth: number,
+        safeAreaEdgeInsets: EdgeInsets,
+        sourceRectClipped: { readonly x: number; readonly y: number; readonly width: number; readonly height: number; },
+        backdropHeight: number,
+    ): PopoverLayout|null {
+        const arrowPoint = {
+            x: Math.max(
+                Math.min(
+                    sourceRectClippedMidpoint.x - Popover.arrowBreadth / 2,
+                    backdropWidth - safeAreaEdgeInsets.right - Popover.arrowBreadth
+                ),
+                safeAreaEdgeInsets.left
+            ),
+            y: Math.max(
+                Math.min(
+                    sourceRectClipped.y - Popover.arrowLength,
+                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.arrowLength
+                ),
+                safeAreaEdgeInsets.top
+            ),
+        } as const;
+
+        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
+        const preferredY: number = arrowPoint.y - Popover.preferredHeight;
+
+        const popoverOrigin = {
+            x: Math.max(
+                preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
+                    preferredX :
+                    backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
+                safeAreaEdgeInsets.left
+            ),
+            y: Math.max(
+                preferredY,
+                safeAreaEdgeInsets.top
+            ),
+        };
+
+        const popoverSize = {
+            width: Math.min(
+                backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
+                Popover.preferredWidth
+            ),
+            height: Math.min(
+                arrowPoint.y - safeAreaEdgeInsets.top,
+                Popover.preferredHeight
+            ),
+        };
+
+        const borderBottomLeftRadius: number = arrowPoint.x <= popoverOrigin.x + Popover.cornerWidth ?
+            0 :
+            Popover.borderRadius;
+        const borderBottomRightRadius: number = arrowPoint.x >= popoverOrigin.x + popoverSize.width - Popover.cornerWidth ?
+            0 :
+            Popover.borderRadius;
+
+        return {
+            arrow: {
+                ...arrowPoint,
+                width: Popover.arrowBreadth,
+                height: Popover.arrowLength,
+            },
+            popover: {
+                ...popoverOrigin,
+                ...popoverSize,
+                borderRadii: {
+                    borderTopRightRadius: Popover.borderRadius,
+                    borderTopLeftRadius: Popover.borderRadius,
+                    borderBottomLeftRadius,
+                    borderBottomRightRadius,
+                },
+            },
+        };
+    }
+
+    private calculatePopoverLayoutForArrowDirectionUp(
         sourceRectClippedMidpoint: { readonly x: number; readonly y: number; },
         backdropWidth: number,
         safeAreaEdgeInsets: EdgeInsets,
