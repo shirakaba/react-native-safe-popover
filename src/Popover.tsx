@@ -319,11 +319,17 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
             // Remembering we're measuring from the origin point (top-left) of the arrow image, orientated as 'v'.
             const arrowPoint = {
                 x: Math.max(
-                    sourceRectClippedMidpoint.x - Popover.arrowBreadth / 2,
+                    Math.min(
+                        sourceRectClippedMidpoint.x - Popover.arrowBreadth / 2,
+                        backdropWidth - safeAreaEdgeInsets.right - Popover.arrowBreadth,
+                    ),
                     safeAreaEdgeInsets.left,
                 ),
                 y: Math.max(
-                    sourceRectClipped.y - Popover.arrowLength,
+                    Math.min(
+                        sourceRectClipped.y - Popover.arrowLength,
+                        backdropHeight - safeAreaEdgeInsets.bottom - Popover.arrowLength,
+                    ),
                     safeAreaEdgeInsets.top,
                 ),
             } as const;
@@ -354,16 +360,6 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                     Popover.preferredHeight,
                 ),
             };
-
-            /* Arrow at left edge */
-            // LOG  [POPOVER] Got popoverLayout.popover: {"height": 400, "width": 300, "x": 0, "y": 427}
-            // LOG  [ARROW  ] Got popoverLayout.arrow  : {"height": 15, "width": 30, "x": 0, "y": 827}
-
-            /* Arrow at right edge */
-            // Popover spans x: 114 -> (114 + 300)
-            // Arrow spans x: 389 -> (389 + 30)
-            // LOG  [POPOVER] Got popoverLayout.popover: {"height": 400, "width": 300, "x": 114, "y": 427}
-            // LOG  [ARROW  ] Got popoverLayout.arrow  : {"height": 15, "width": 30, "x": 389, "y": 827}
 
             const borderBottomLeftRadius: number = arrowPoint.x <= popoverOrigin.x + Popover.cornerWidth ? 
                 0 : 
