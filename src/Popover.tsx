@@ -387,7 +387,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
             //   ┌───┐
             // █<┤   │
             //   └───┘
-            
+            return this.calculatePopoverLayoutForArrowDirectionLeft(sourceRectClippedMidpoint, backdropWidth, safeAreaEdgeInsets, sourceRectClipped, backdropHeight);
         } else if(arrowDirection === PopoverArrowDirection.right){
             //  ┌───┐
             //  │   ├>█
@@ -570,33 +570,33 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
         const arrowPoint = {
             x: Math.max(
                 Math.min(
-                    sourceRectClippedMidpoint.x - Popover.arrowBreadth / 2,
-                    backdropWidth - safeAreaEdgeInsets.right - Popover.arrowBreadth
+                    sourceRectClipped.x + sourceRectClipped.width,
+                    backdropWidth - safeAreaEdgeInsets.right - Popover.arrowLength
                 ),
                 safeAreaEdgeInsets.left
             ),
             y: Math.max(
                 Math.min(
-                    sourceRectClipped.y + sourceRectClipped.height,
-                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.arrowLength
+                    sourceRectClippedMidpoint.y - Popover.arrowBreadth / 2,
+                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.arrowBreadth
                 ),
                 safeAreaEdgeInsets.top
             ),
         } as const;
 
-        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
-        const preferredY: number = arrowPoint.y + Popover.arrowLength;
+        const preferredX: number = arrowPoint.x + Popover.arrowLength;
+        const preferredY: number = sourceRectClippedMidpoint.y - Popover.preferredHeight / 2;
 
         const popoverOrigin = {
             x: Math.max(
-                preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
-                    preferredX :
-                    backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
-                safeAreaEdgeInsets.left
+                Math.min(preferredX, backdropWidth - safeAreaEdgeInsets.right),
+                arrowPoint.x + Popover.arrowLength
             ),
-            y: Math.min(
-                preferredY,
-                backdropHeight - safeAreaEdgeInsets.bottom
+            y: Math.max(
+                preferredY + Popover.preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ?
+                    preferredY :
+                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.preferredHeight,
+                safeAreaEdgeInsets.top
             ),
         };
 
@@ -606,31 +606,31 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                 Popover.preferredWidth
             ),
             height: Math.min(
-                (backdropHeight - safeAreaEdgeInsets.bottom) - preferredY,
+                backdropHeight - safeAreaEdgeInsets.bottom - safeAreaEdgeInsets.top,
                 Popover.preferredHeight
             ),
         };
 
-        const borderTopLeftRadius: number = arrowPoint.x <= popoverOrigin.x + Popover.cornerWidth ?
+        const borderTopLeftRadius: number = arrowPoint.y <= popoverOrigin.y + Popover.cornerWidth ?
             0 :
             Popover.borderRadius;
-        const borderTopRightRadius: number = arrowPoint.x >= popoverOrigin.x + popoverSize.width - Popover.cornerWidth ?
+        const borderBottomLeftRadius: number = arrowPoint.y >= popoverOrigin.y + popoverSize.height - Popover.cornerWidth ?
             0 :
             Popover.borderRadius;
 
         return {
             arrow: {
                 ...arrowPoint,
-                width: Popover.arrowBreadth,
-                height: Popover.arrowLength,
+                width: Popover.arrowLength,
+                height: Popover.arrowBreadth,
             },
             popover: {
                 ...popoverOrigin,
                 ...popoverSize,
                 borderRadii: {
-                    borderTopRightRadius,
+                    borderTopRightRadius: Popover.borderRadius,
                     borderTopLeftRadius,
-                    borderBottomLeftRadius: Popover.borderRadius,
+                    borderBottomLeftRadius,
                     borderBottomRightRadius: Popover.borderRadius,
                 },
             },
@@ -671,7 +671,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
 
                     // TODO: strict typing
                     const popoverLayout = this.calculatePopoverLayout(
-                        PopoverArrowDirection.up,
+                        PopoverArrowDirection.left,
                         {
                             left: Math.max(edgeInsets?.left ?? 0, popoverMinimumLayoutMargins?.left ?? 0),
                             top: Math.max(edgeInsets?.top ?? 0, popoverMinimumLayoutMargins?.top ?? 0),
@@ -755,7 +755,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                 width={popoverLayout?.arrow?.width ?? 0}
                                 height={popoverLayout?.arrow?.height ?? 0}
                                 color={"white"}
-                                direction={"up"}
+                                direction={"left"}
                             />
                         </Modal>
                     );
