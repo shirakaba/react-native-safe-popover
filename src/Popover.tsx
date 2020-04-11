@@ -17,6 +17,27 @@ export enum PopoverArrowDirection {
     unknown,
 }
 
+interface PopoverLayout {
+    arrow: {
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+    },
+    popover: {
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+        borderRadii: {
+            borderTopRightRadius: number,
+            borderTopLeftRadius: number,
+            borderBottomLeftRadius: number,
+            borderBottomRightRadius: number,
+        },
+    },
+}
+
 export interface PopoverProps {
     sourceView?: React.RefObject<View>,
     dismissModalOnBackdropPress?: () => void,
@@ -129,6 +150,9 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
      */
     private static readonly minimumHeight: number = 200;
 
+    private static readonly borderRadius: number = 15;
+    private static readonly cornerWidth: number = Popover.borderRadius * 2;
+
     constructor(props: PopoverProps){
         super(props);
 
@@ -239,7 +263,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
         arrowDirection: PopoverArrowDirection,
         safeAreaEdgeInsets: EdgeInsets,
         sourceRect: { x: number, y: number, width: number, height: number },
-    ) => {
+    ): PopoverLayout|null => {
         const {
             backdropHeight,
             backdropWidth,
@@ -331,6 +355,23 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                 ),
             };
 
+            /* Arrow at left edge */
+            // LOG  [POPOVER] Got popoverLayout.popover: {"height": 400, "width": 300, "x": 0, "y": 427}
+            // LOG  [ARROW  ] Got popoverLayout.arrow  : {"height": 15, "width": 30, "x": 0, "y": 827}
+
+            /* Arrow at right edge */
+            // Popover spans x: 114 -> (114 + 300)
+            // Arrow spans x: 389 -> (389 + 30)
+            // LOG  [POPOVER] Got popoverLayout.popover: {"height": 400, "width": 300, "x": 114, "y": 427}
+            // LOG  [ARROW  ] Got popoverLayout.arrow  : {"height": 15, "width": 30, "x": 389, "y": 827}
+
+            const borderBottomLeftRadius: number = arrowPoint.x <= popoverOrigin.x + Popover.cornerWidth ? 
+                0 : 
+                Popover.borderRadius;
+            const borderBottomRightRadius: number = arrowPoint.x >= popoverOrigin.x + popoverSize.width - Popover.cornerWidth ? 
+                0 : 
+                Popover.borderRadius;
+
             return {
                 arrow: {
                     ...arrowPoint,
@@ -340,6 +381,12 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                 popover: {
                     ...popoverOrigin,
                     ...popoverSize,
+                    borderRadii: {
+                        borderTopRightRadius: Popover.borderRadius,
+                        borderTopLeftRadius: Popover.borderRadius,
+                        borderBottomLeftRadius,
+                        borderBottomRightRadius,
+                    },
                 },
             };
 
@@ -448,7 +495,8 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                             ...sourceRect,
                         }
                     );
-                    console.log(`Got popoverLayout.popover:`, popoverLayout!.popover);
+                    console.log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout!.popover);
+                    console.log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout!.arrow);
 
                     // let arrowDirectionToUse: PopoverArrowDirection;
                     // if(permittedArrowDirections.some(dir => dir === PopoverArrowDirection.down)){
@@ -480,7 +528,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                     style={{
                                         position: "absolute",
                                         backgroundColor: "white",
-                                        borderRadius: 15,
+                                        ...popoverLayout!.popover.borderRadii,
                                         overflow: "hidden",
 
                                         // width: this.state.backdropWidth / 2,
@@ -495,7 +543,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                 >
                                     <TouchableWithoutFeedback
                                         style={{
-                                            borderRadius: 15,
+                                            ...popoverLayout!.popover.borderRadii,
                                             width: "100%",
                                             height: "100%",
                                             overflow: "hidden",
