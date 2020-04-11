@@ -7,7 +7,18 @@ function MySafeAreaConsumer() {
   const insets = useSafeArea();
   const [popupVisible, setPopupVisible] = React.useState(false);
   const [lastClickedTarget, setLastClickedTarget] = React.useState<React.RefObject<View>|null>(null);
-  const targetRef = React.useRef(null);
+  const nwTargetRef = React.useRef(null);
+  const nTargetRef = React.useRef(null);
+  const neTargetRef = React.useRef(null);
+
+  const wTargetRef = React.useRef(null);
+  const centralTargetRef = React.useRef(null);
+  const eTargetRef = React.useRef(null);
+
+  const swTargetRef = React.useRef(null);
+  const sTargetRef = React.useRef(null);
+  const seTargetRef = React.useRef(null);
+
   const unsafeTopRef = React.useRef(null);
   const unsafeBottomRef = React.useRef(null);
   const unsafeLeftRef = React.useRef(null);
@@ -42,10 +53,10 @@ function MySafeAreaConsumer() {
     // setPopupVisible(true);
   };
 
-  const onHitboxPress = (event: GestureResponderEvent) => {
-    console.log("[onHitboxPress]");
+  const onTargetPress = (event: GestureResponderEvent, ref: React.RefObject<View>, whichTarget: string) => {
+    console.log(`[onTargetPress] ${whichTarget}`);
     const { } = event.nativeEvent;
-    setLastClickedTarget(targetRef);
+    setLastClickedTarget(ref);
     setPopupVisible(true);
   };
 
@@ -88,22 +99,51 @@ function MySafeAreaConsumer() {
               styles.safe,
               {
                 alignItems: "center",
-                justifyContent: "center",
+                justifyContent: "space-between",
               },
             ]}
           >
-            <TouchableWithoutFeedback onPress={onHitboxPress}>
-              <View ref={targetRef} style={[styles.target]}></View>
-            </TouchableWithoutFeedback>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, nwTargetRef, "nw")}>
+                <View ref={nwTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
 
-            <SafePopover
-              sourceView={lastClickedTarget!}
-              modalVisible={popupVisible}
-              dismissModalOnBackdropPress={onBackdropPress}
-              canOverlapSourceViewRect={false}
-            >
-              <Text>I'm the content of this popover!</Text>
-            </SafePopover>
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, nTargetRef, "n")}>
+                <View ref={nTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, neTargetRef, "ne")}>
+                <View ref={neTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+            </View>
+
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>  
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, wTargetRef, "w")}>
+                <View ref={wTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, centralTargetRef, "central")}>
+                <View ref={centralTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, eTargetRef, "e")}>
+                <View ref={eTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+            </View>
+
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, swTargetRef, "sw")}>
+                <View ref={swTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, sTargetRef, "s")}>
+                <View ref={sTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+
+              <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, seTargetRef, "se")}>
+                <View ref={seTargetRef} style={[styles.target]}></View>
+              </TouchableWithoutFeedback>
+            </View>
           </View>
         </TouchableWithoutFeedback>
 
@@ -133,6 +173,15 @@ function MySafeAreaConsumer() {
         >
         </View>
       </TouchableWithoutFeedback>
+
+      <SafePopover
+        sourceView={lastClickedTarget!}
+        modalVisible={popupVisible}
+        dismissModalOnBackdropPress={onBackdropPress}
+        canOverlapSourceViewRect={false}
+      >
+        <Text>I'm the content of this popover!</Text>
+      </SafePopover>
     </View>
   );
 }
@@ -173,8 +222,8 @@ const styles = StyleSheet.create({
   },
   target: {
     backgroundColor: "blue",
-    width: 90,
-    height: 90,
+    width: 20,
+    height: 20,
   },
   container: {
     flex: 1,
