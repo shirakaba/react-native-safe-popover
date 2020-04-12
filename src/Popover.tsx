@@ -117,7 +117,7 @@ interface PopoverState {
     backdropHeight: number,
 }
 
-export class Popover extends React.Component<PopoverProps, PopoverState> {
+export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     public static defaultProps = {
         permittedArrowDirections: [PopoverArrowDirection.down, PopoverArrowDirection.up, PopoverArrowDirection.left, PopoverArrowDirection.right],
         popoverMinimumLayoutMargins: {
