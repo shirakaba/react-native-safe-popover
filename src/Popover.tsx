@@ -62,6 +62,11 @@ export interface PopoverProps {
      * @default "rgba(0,0,0,0.25)"
      */
     backdropColor?: string,
+    /** 
+     * The background colour of the popover.
+     * @default "white"
+     */
+    popoverColor?: string,
     /**
      * The width of the rect encompassing the source view.
      */
@@ -141,6 +146,7 @@ interface PopoverState {
 
 export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     public static defaultProps = {
+        popoverColor: "white",
         backdropColor: "rgba(0,0,0,0.25)",
         animationType: "fade",
         permittedArrowDirections: [PopoverArrowDirection.down, PopoverArrowDirection.up, PopoverArrowDirection.left, PopoverArrowDirection.right],
@@ -848,7 +854,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                                 <View
                                     style={{
                                         position: "absolute",
-                                        backgroundColor: "white",
+                                        backgroundColor: this.props.popoverColor,
                                         ...popoverLayout.popover.borderRadii,
                                         overflow: "hidden",
 
@@ -884,7 +890,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                                 }}
                                 width={popoverLayout.arrow.width}
                                 height={popoverLayout.arrow.height}
-                                color={"white"}
+                                color={this.props.popoverColor}
                                 direction={popoverLayout.arrow.direction === "none" ? "down" : popoverLayout.arrow.direction}
                             />
                         </Modal>
