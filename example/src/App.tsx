@@ -1,10 +1,11 @@
 import * as React from 'react';
-import { StyleSheet, View, Text, TouchableWithoutFeedback, GestureResponderEvent } from 'react-native';
+import { StyleSheet, View, Text, TouchableWithoutFeedback, GestureResponderEvent, LayoutChangeEvent } from 'react-native';
 import { SafeAreaProvider, useSafeArea } from "react-native-safe-area-context";
 import SafePopover from 'react-native-safe-popover';
 
 function MySafeAreaConsumer() {
   const insets = useSafeArea();
+  const [targetRect, setTargetRect] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
   const [popupVisible, setPopupVisible] = React.useState(false);
   const [lastClickedTarget, setLastClickedTarget] = React.useState<React.RefObject<View>|null>(null);
   const nwTargetRef = React.useRef(null);
@@ -62,6 +63,27 @@ function MySafeAreaConsumer() {
 
   const onBackdropPress = () => {
     setPopupVisible(false);
+  };
+
+  const onTargetLayout = (e: LayoutChangeEvent, targetRef: React.RefObject<View>) => {
+    /**
+     * The "layout" event gives the latest dimensions of the backdrop, which equal those of the modal,
+     * which is full-screen, and so these measurements can reflect the window dimensions.
+     * 
+     * We have to clone the event because events are pooled (re-used) in React.
+     */
+    const layout = { ...e.nativeEvent.layout };
+    const target = targetRef.current;
+    if(!target){
+      return;
+    }
+    target.measureInWindow(
+      (x: number, y: number, width: number, height: number) => {
+        console.log(`[target.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}`);
+
+        setTargetRect({ x, y, width, height });
+      }
+    );
   };
 
   return (
@@ -123,7 +145,7 @@ function MySafeAreaConsumer() {
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, centralTargetRef, "central")}>
-                <View ref={centralTargetRef} style={[styles.target]}></View>
+                <View ref={centralTargetRef} onLayout={e => onTargetLayout(e, centralTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, eTargetRef, "e")}>
@@ -175,7 +197,10 @@ function MySafeAreaConsumer() {
       </TouchableWithoutFeedback>
 
       <SafePopover
-        sourceView={lastClickedTarget!}
+        sourceRectHeight={targetRect.height}
+        sourceRectWidth={targetRect.width}
+        sourceRectX={targetRect.x}
+        sourceRectY={targetRect.y}
         modalVisible={popupVisible}
         dismissModalOnBackdropPress={onBackdropPress}
         canOverlapSourceViewRect={false}

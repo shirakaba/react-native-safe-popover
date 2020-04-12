@@ -40,7 +40,27 @@ interface PopoverLayout {
 }
 
 export interface PopoverProps {
-    sourceView?: React.RefObject<View>,
+    /**
+     * The width of the rect encompassing the source view.
+     */
+    sourceRectWidth: number,
+    /**
+     * The height of the rect encompassing the source view.
+     */
+    sourceRectHeight: number,
+    /**
+     * The x-position of the rect encompassing the source view.
+     * Is measured relative to the backdrop origin point.
+     * In other words, the x-offset from the backdrop origin point.
+     */
+    sourceRectX: number,
+    /**
+     * The y-position of the rect encompassing the source view.
+     * Is measured relative to the backdrop origin point.
+     * In other words, the y-offset from the backdrop origin point.
+     */
+    sourceRectY: number,
+
     dismissModalOnBackdropPress?: () => void,
     /**
      * @default false
@@ -87,26 +107,6 @@ export interface PopoverProps {
 interface PopoverState {
     // modalVisible: boolean,
 
-    /**
-     * The width of the rect encompassing the source view.
-     */
-    sourceRectWidth: number,
-    /**
-     * The height of the rect encompassing the source view.
-     */
-    sourceRectHeight: number,
-    /**
-     * The x-position of the rect encompassing the source view.
-     * Is measured relative to the backdrop origin point.
-     * In other words, the x-offset from the backdrop origin point.
-     */
-    sourceRectX: number,
-    /**
-     * The y-position of the rect encompassing the source view.
-     * Is measured relative to the backdrop origin point.
-     * In other words, the y-offset from the backdrop origin point.
-     */
-    sourceRectY: number,
     /**
      * The width of the backdrop (assumed to equal the width of the screen)
      */
@@ -181,10 +181,6 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
         this.state = {
             backdropWidth: 0,
             backdropHeight: 0,
-            sourceRectX: 0,
-            sourceRectY: 0,
-            sourceRectWidth: 0,
-            sourceRectHeight: 0,
         };
     }
 
@@ -222,61 +218,19 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
     /**
      * This event races against the edgeInsets updates. I've seen edgeInsets update after this.
      */
-    private readonly onLayout = (e: LayoutChangeEvent, edgeInsets: EdgeInsets) => {
+    private readonly onLayout = (e: LayoutChangeEvent) => {
         /**
          * The "layout" event gives the latest dimensions of the backdrop, which equal those of the modal,
          * which is full-screen, and so these measurements can reflect the window dimensions.
-         * 
-         * We have to clone the event because events are pooled (re-used) in React.
          */
-        const layout = { ...e.nativeEvent.layout };
-        
-        if(this.props.sourceView?.current && this.backdropRef.current){
-            console.log(`[Popover.onLayout] got both refs. Measuring...`);
-            /**
-             * The values returned by measureInWindow give the position of the source view within the window,
-             * so they are effectively relative to the dimensions of the "layout" event above.
-             * 
-             * BUG: If you call measureInWindow() immediately upon onLayout(), the dimensions may be off by ~25 pixels.
-             * I think this is because the safe area is updating bit-by-bit upon orientation change.
-             * Waiting 75 milliseconds solves this bug, but makes the popup glitchier in other use-cases.
-             */
-            this.props.sourceView?.current?.measureInWindow(
-                (x: number, y: number, width: number, height: number) => {
-                    console.log(`[Popover.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}\n- edgeInsets: ${JSON.stringify(edgeInsets)}`);
+        const { width, height } = e.nativeEvent.layout;
 
-                    /* Need to somehow get edgeInsets */
-                    // const popoverLayout = this.calculatePopoverLayout(
-                    //     PopoverArrowDirection.down,
-                    //     edgeInsets,
-                    //     {
-                    //         x,
-                    //         y,
-                    //         width,
-                    //         height,
-                    //     }
-                    // );
-
-                    this.setState({
-                        backdropWidth: layout.width,
-                        backdropHeight: layout.height,
-
-                        sourceRectHeight: height,
-                        sourceRectWidth: width,
-                        sourceRectX: x,
-                        sourceRectY: y,
-                    }, () => {
-                        console.log(`[Popover.onLayout] measureInWindow setState complete`);
-                    });
-                }
-            );
-        } else {
-            console.log(`[Popover.onLayout] One or more refs were missing.`);
-            this.setState({
-                backdropWidth: layout.width,
-                backdropHeight: layout.height,
-            });
-        }
+        this.setState({
+            backdropWidth: width,
+            backdropHeight: height,
+        }, () => {
+            console.log(`[Popover.onLayout] onLayout setState complete`);
+        });
     };
 
     private readonly calculatePopoverLayout = (
@@ -748,10 +702,10 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                     // TODO: allow defining edge insets in addition to the implicit safe area insets.
 
                     const sourceRect = {
-                        x: this.state.sourceRectX,
-                        y: this.state.sourceRectY,
-                        width: this.state.sourceRectWidth,
-                        height: this.state.sourceRectHeight,
+                        x: this.props.sourceRectX,
+                        y: this.props.sourceRectY,
+                        width: this.props.sourceRectWidth,
+                        height: this.props.sourceRectHeight,
                     } as const;
 
                     console.log(`Got sourceRect`, sourceRect);
@@ -800,7 +754,7 @@ export class Popover extends React.Component<PopoverProps, PopoverState> {
                                     width: "100%",
                                     height: "100%",
                                 }}
-                                onLayout={(event) => this.onLayout(event, edgeInsets!)}
+                                onLayout={(event) => this.onLayout(event)}
                             >
                                 {/* Popover */}
                                 <View
