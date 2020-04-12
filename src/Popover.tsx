@@ -50,6 +50,19 @@ interface PopoverLayout {
 
 export interface PopoverProps {
     /**
+     * The `animationType` prop controls how the modal animates.
+     *
+     * - `slide` slides in from the bottom
+     * - `fade` fades into view
+     * - `none` appears without an animation
+     */
+    animationType?: 'none' | 'slide' | 'fade';
+    /** 
+     * The background colour of the backdrop.
+     * @default "rgba(0,0,0,0.25)"
+     */
+    backdropColor?: string,
+    /**
      * The width of the rect encompassing the source view.
      */
     sourceRectWidth: number,
@@ -128,6 +141,8 @@ interface PopoverState {
 
 export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     public static defaultProps = {
+        backdropColor: "rgba(0,0,0,0.25)",
+        animationType: "fade",
         permittedArrowDirections: [PopoverArrowDirection.down, PopoverArrowDirection.up, PopoverArrowDirection.left, PopoverArrowDirection.right],
         popoverMinimumLayoutMargins: {
             top: 10,
@@ -702,11 +717,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                         backdropWidth,
                     } = this.state;
 
-                    // ==ASSUMPTIONS==
-                    // 1) We're using Modal, so the backdrop and the screen are exactly the same.
-                    // 2) Thus, the screen's safe area insets equally apply to the backdrop.
-                    const safeAreaWidth: number = backdropWidth - edgeInsets!.left - edgeInsets!.right;
-                    const safeAreaHeight: number = backdropHeight - edgeInsets!.top - edgeInsets!.bottom;
+                    /* ==ASSUMPTIONS==
+                     * 1) We're using Modal, so the backdrop and the screen are exactly the same.
+                     * 2) Thus, the screen's safe area insets equally apply to the backdrop. */
+                    // const safeAreaWidth: number = backdropWidth - edgeInsets!.left - edgeInsets!.right;
+                    // const safeAreaHeight: number = backdropHeight - edgeInsets!.top - edgeInsets!.bottom;
 
                     // TODO: allow defining edge insets in addition to the implicit safe area insets.
 
@@ -747,7 +762,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
 
                     return (
                         <Modal
-                            animationType="fade"
+                            animationType={this.props.animationType}
                             transparent={true}
                             visible={this.props.modalVisible}
                             onRequestClose={this.onRequestClose}
@@ -759,7 +774,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                                 ref={this.backdropRef}
                                 onPress={this.onBackdropPress}
                                 style={{
-                                    backgroundColor: "rgba(0,0,0,0.25)",
+                                    backgroundColor: this.props.backdropColor,
                                     width: "100%",
                                     height: "100%",
                                 }}
