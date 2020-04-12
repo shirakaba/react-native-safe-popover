@@ -7,7 +7,6 @@ function MySafeAreaConsumer() {
   const insets = useSafeArea();
   const [targetRect, setTargetRect] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
   const [popupVisible, setPopupVisible] = React.useState(false);
-  const [lastClickedTarget, setLastClickedTarget] = React.useState<React.RefObject<View>|null>(null);
   const nwTargetRef = React.useRef(null);
   const nTargetRef = React.useRef(null);
   const neTargetRef = React.useRef(null);
@@ -20,44 +19,38 @@ function MySafeAreaConsumer() {
   const sTargetRef = React.useRef(null);
   const seTargetRef = React.useRef(null);
 
+  const safeAreaRef = React.useRef(null);
   const unsafeTopRef = React.useRef(null);
   const unsafeBottomRef = React.useRef(null);
   const unsafeLeftRef = React.useRef(null);
   const unsafeRightRef = React.useRef(null);
 
-  const onUnsafeAreaPress = (event: GestureResponderEvent, whichInset: "top"|"left"|"bottom"|"right") => {
-    console.log(`[onUnsafeAreaPress] ${whichInset}`);
-    const { } = event.nativeEvent;
+  const onTargetPress = (event: GestureResponderEvent, targetRef: React.RefObject<View>, whichTarget: string) => {
+    console.log(`[onTargetPress] ${whichTarget}`);
 
-    switch(whichInset){
-      case "bottom":
-        setLastClickedTarget(unsafeBottomRef);
-        break;
-      case "top":
-        setLastClickedTarget(unsafeTopRef);
-        break;
-      case "left":
-        setLastClickedTarget(unsafeLeftRef);
-        break;
-      case "right":
-        setLastClickedTarget(unsafeRightRef);
-        break;
+    if(whichTarget === "safeArea"){
+      console.log(`[onTargetPress] ${whichTarget} – suppressing display of popup for this particular target.`);
+      return;
     }
 
-    setPopupVisible(true);
-  };
+    if(whichTarget.startsWith("unsafe")){
+      /* No-op, but could consider special tests for unsafe area presses later. */
+    }
 
-  const onSafeAreaPress = (event: GestureResponderEvent) => {
-    console.log(`[onsafeAreaPress]`);
-    const { } = event.nativeEvent;
-    // setLastClickedTarget(targetRef);
-    // setPopupVisible(true);
-  };
+    /* Note: we could consider the actual position of the touch, but for now the purpose of the test is just to track the target. */
+    const layout = { };
 
-  const onTargetPress = (event: GestureResponderEvent, ref: React.RefObject<View>, whichTarget: string) => {
-    console.log(`[onTargetPress] ${whichTarget}`);
-    const { } = event.nativeEvent;
-    setLastClickedTarget(ref);
+    const target = targetRef.current;
+    if(!target){
+      return;
+    }
+    target.measureInWindow(
+      (x: number, y: number, width: number, height: number) => {
+        console.log(`[target.onTargetPress] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}`);
+
+        setTargetRect({ x, y, width, height });
+      }
+    );
     setPopupVisible(true);
   };
 
@@ -88,9 +81,9 @@ function MySafeAreaConsumer() {
 
   return (
     <View style={styles.container}>
-      <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "top")}>
+      <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, unsafeTopRef, "unsafeTop")}>
         <View
-          ref={unsafeTopRef}
+          ref={unsafeTopRef} onLayout={e => onTargetLayout(e, unsafeTopRef)}
           style={[
             styles.unsafeVertical,
             {
@@ -102,9 +95,9 @@ function MySafeAreaConsumer() {
       </TouchableWithoutFeedback>
 
       <View style={styles.centralRow}>
-        <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "left")}>
+        <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, unsafeLeftRef, "unsafeLeft")}>
           <View
-            ref={unsafeLeftRef}
+            ref={unsafeLeftRef} onLayout={e => onTargetLayout(e, unsafeLeftRef)}
             style={[
               styles.unsafeHorizontal,
               {
@@ -115,8 +108,9 @@ function MySafeAreaConsumer() {
           </View>
         </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback onPress={(event) => onSafeAreaPress(event)}>
+        <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, safeAreaRef, "safeArea")}>
           <View
+            ref={safeAreaRef}
             style={[
               styles.safe,
               {
@@ -127,21 +121,21 @@ function MySafeAreaConsumer() {
           >
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, nwTargetRef, "nw")}>
-                <View ref={nwTargetRef} style={[styles.target]}></View>
+                <View ref={nwTargetRef} onLayout={e => onTargetLayout(e, nwTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, nTargetRef, "n")}>
-                <View ref={nTargetRef} style={[styles.target]}></View>
+                <View ref={nTargetRef} onLayout={e => onTargetLayout(e, nTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, neTargetRef, "ne")}>
-                <View ref={neTargetRef} style={[styles.target]}></View>
+                <View ref={neTargetRef} onLayout={e => onTargetLayout(e, neTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
             </View>
 
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>  
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, wTargetRef, "w")}>
-                <View ref={wTargetRef} style={[styles.target]}></View>
+                <View ref={wTargetRef} onLayout={e => onTargetLayout(e, wTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, centralTargetRef, "central")}>
@@ -149,29 +143,29 @@ function MySafeAreaConsumer() {
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, eTargetRef, "e")}>
-                <View ref={eTargetRef} style={[styles.target]}></View>
+                <View ref={eTargetRef} onLayout={e => onTargetLayout(e, eTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
             </View>
 
             <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, swTargetRef, "sw")}>
-                <View ref={swTargetRef} style={[styles.target]}></View>
+                <View ref={swTargetRef} onLayout={e => onTargetLayout(e, swTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, sTargetRef, "s")}>
-                <View ref={sTargetRef} style={[styles.target]}></View>
+                <View ref={sTargetRef} onLayout={e => onTargetLayout(e, sTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
 
               <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, seTargetRef, "se")}>
-                <View ref={seTargetRef} style={[styles.target]}></View>
+                <View ref={seTargetRef} onLayout={e => onTargetLayout(e, seTargetRef)} style={[styles.target]}></View>
               </TouchableWithoutFeedback>
             </View>
           </View>
         </TouchableWithoutFeedback>
 
-        <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "right")}>
+        <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, unsafeRightRef, "unsafeRight")}>
           <View
-            ref={unsafeRightRef}
+            ref={unsafeRightRef} onLayout={e => onTargetLayout(e, unsafeRightRef)}
             style={[
               styles.unsafeHorizontal,
               {
@@ -183,9 +177,9 @@ function MySafeAreaConsumer() {
         </TouchableWithoutFeedback>
       </View>
 
-      <TouchableWithoutFeedback onPress={(event) => onUnsafeAreaPress(event, "bottom")}>
+      <TouchableWithoutFeedback onPress={(event) => onTargetPress(event, unsafeBottomRef, "unsafeBottom")}>
         <View
-          ref={unsafeBottomRef}
+          ref={unsafeBottomRef} onLayout={e => onTargetLayout(e, unsafeBottomRef)}
           style={[
             styles.unsafeVertical,
             {
