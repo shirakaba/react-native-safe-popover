@@ -50,13 +50,23 @@ interface PopoverLayout {
 
 export interface PopoverProps {
     /**
+     * The preferred width of the popover if adequate space is available.
+     * Does not alter upon rotation; popover always maintains a portrait orientation.
+     */
+    preferredWidth?: number,
+    /**
+     * The preferred height of the popover if adequate space is available.
+     * Does not alter upon rotation; popover always maintains a portrait orientation.
+     */
+    preferredHeight?: number,
+    /**
      * The `animationType` prop controls how the modal animates.
      *
      * - `slide` slides in from the bottom
      * - `fade` fades into view
      * - `none` appears without an animation
      */
-    animationType?: 'none' | 'slide' | 'fade';
+    animationType?: 'none' | 'slide' | 'fade',
     /** 
      * The background colour of the backdrop.
      * @default "rgba(0,0,0,0.25)"
@@ -146,6 +156,8 @@ interface PopoverState {
 
 export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     public static defaultProps = {
+        preferredWidth: 300,
+        preferredHeight: 400,
         popoverColor: "white",
         backdropColor: "rgba(0,0,0,0.25)",
         animationType: "fade",
@@ -179,26 +191,17 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     private static readonly arrowBreadth: number = 30;
 
     /**
-     * The preferred width of the popover if adequate space is available.
-     * Does not alter upon rotation; popover always maintains a portrait orientation.
-     */
-    private static readonly preferredWidth: number = 300;
-    /**
-     * The preferred height of the popover if adequate space is available.
-     * Does not alter upon rotation; popover always maintains a portrait orientation.
-     */
-    private static readonly preferredHeight: number = 400;
-
-    /**
+     * NOT IMPLEMENTED
      * The minimum width for a popover of "adequate size".
      * Does not alter upon rotation; popover always maintains a portrait orientation.
      */
-    private static readonly minimumWidth: number = 200;
+    // private static readonly minimumWidth: number = 200;
     /**
+     * NOT IMPLEMENTED
      * The minimum height for a popover of "adequate size".
      * Does not alter upon rotation; popover always maintains a portrait orientation.
      */
-    private static readonly minimumHeight: number = 200;
+    // private static readonly minimumHeight: number = 200;
 
     private static readonly borderRadius: number = 15;
     private static readonly cornerWidth: number = Popover.borderRadius * 2;
@@ -346,7 +349,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             if(layout === null){
                 continue;
             }
-            if(layout.popover.height === Popover.preferredHeight && layout.popover.width === Popover.preferredWidth){
+            if(layout.popover.height === this.props.preferredHeight && layout.popover.width === this.props.preferredWidth){
                 // First layout in priority order to satisfy constraints completely, so can bail out.
                 return layout;
             }
@@ -413,14 +416,14 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             ),
         } as const;
 
-        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
-        const preferredY: number = arrowPoint.y - Popover.preferredHeight;
+        const preferredX: number = sourceRectClippedMidpoint.x - this.props.preferredWidth! / 2;
+        const preferredY: number = arrowPoint.y - this.props.preferredHeight!;
 
         const popoverOrigin = {
             x: Math.max(
-                preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
+                preferredX + this.props.preferredWidth! <= backdropWidth - safeAreaEdgeInsets.right ?
                     preferredX :
-                    backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
+                    backdropWidth - safeAreaEdgeInsets.right - this.props.preferredWidth!,
                 safeAreaEdgeInsets.left
             ),
             y: Math.max(
@@ -432,11 +435,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         const popoverSize = {
             width: Math.min(
                 backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-                Popover.preferredWidth
+                this.props.preferredWidth!
             ),
             height: Math.min(
                 arrowPoint.y - safeAreaEdgeInsets.top,
-                Popover.preferredHeight
+                this.props.preferredHeight!
             ),
         };
 
@@ -491,14 +494,14 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             ),
         } as const;
 
-        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
+        const preferredX: number = sourceRectClippedMidpoint.x - this.props.preferredWidth! / 2;
         const preferredY: number = arrowPoint.y + Popover.arrowLength;
 
         const popoverOrigin = {
             x: Math.max(
-                preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
+                preferredX + this.props.preferredWidth! <= backdropWidth - safeAreaEdgeInsets.right ?
                     preferredX :
-                    backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
+                    backdropWidth - safeAreaEdgeInsets.right - this.props.preferredWidth!,
                 safeAreaEdgeInsets.left
             ),
             y: Math.min(
@@ -510,11 +513,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         const popoverSize = {
             width: Math.min(
                 backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-                Popover.preferredWidth
+                this.props.preferredWidth!
             ),
             height: Math.min(
                 (backdropHeight - safeAreaEdgeInsets.bottom) - preferredY,
-                Popover.preferredHeight
+                this.props.preferredHeight!
             ),
         };
 
@@ -570,7 +573,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         } as const;
 
         const preferredX: number = arrowPoint.x + Popover.arrowLength;
-        const preferredY: number = sourceRectClippedMidpoint.y - Popover.preferredHeight / 2;
+        const preferredY: number = sourceRectClippedMidpoint.y - this.props.preferredHeight! / 2;
 
         const popoverOrigin = {
             x: Math.max(
@@ -578,9 +581,9 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                 arrowPoint.x + Popover.arrowLength
             ),
             y: Math.max(
-                preferredY + Popover.preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ?
+                preferredY + this.props.preferredHeight! <= backdropHeight - safeAreaEdgeInsets.bottom ?
                     preferredY :
-                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.preferredHeight,
+                    backdropHeight - safeAreaEdgeInsets.bottom - this.props.preferredHeight!,
                 safeAreaEdgeInsets.top
             ),
         };
@@ -588,11 +591,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         const popoverSize = {
             width: Math.min(
                 backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-                Popover.preferredWidth
+                this.props.preferredWidth!
             ),
             height: Math.min(
                 backdropHeight - safeAreaEdgeInsets.bottom - safeAreaEdgeInsets.top,
-                Popover.preferredHeight
+                this.props.preferredHeight!
             ),
         };
 
@@ -647,8 +650,8 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             ),
         } as const;
 
-        const preferredX: number = arrowPoint.x - Popover.preferredWidth;
-        const preferredY: number = sourceRectClippedMidpoint.y - Popover.preferredHeight / 2;
+        const preferredX: number = arrowPoint.x - this.props.preferredWidth!;
+        const preferredY: number = sourceRectClippedMidpoint.y - this.props.preferredHeight! / 2;
 
         log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
 
@@ -658,9 +661,9 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                 arrowPoint.x
             ),
             y: Math.max(
-                preferredY + Popover.preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ?
+                preferredY + this.props.preferredHeight! <= backdropHeight - safeAreaEdgeInsets.bottom ?
                     preferredY :
-                    backdropHeight - safeAreaEdgeInsets.bottom - Popover.preferredHeight,
+                    backdropHeight - safeAreaEdgeInsets.bottom - this.props.preferredHeight!,
                 safeAreaEdgeInsets.top
             ),
         };
@@ -669,11 +672,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             width: Math.min(
                 arrowPoint.x - safeAreaEdgeInsets.left,
                 backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-                Popover.preferredWidth
+                this.props.preferredWidth!
             ),
             height: Math.min(
                 backdropHeight - safeAreaEdgeInsets.bottom - safeAreaEdgeInsets.top,
-                Popover.preferredHeight
+                this.props.preferredHeight!
             ),
         };
 
@@ -716,26 +719,26 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             y: 0,
         } as const;
 
-        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
-        const preferredY: number = sourceRectClippedMidpoint.y - Popover.preferredHeight / 2;
+        const preferredX: number = sourceRectClippedMidpoint.x - this.props.preferredWidth! / 2;
+        const preferredY: number = sourceRectClippedMidpoint.y - this.props.preferredHeight! / 2;
 
         log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
 
         const popoverOrigin = {
             x: Math.min(
                 Math.max(
-                    preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ? 
+                    preferredX + this.props.preferredWidth! <= backdropWidth - safeAreaEdgeInsets.right ? 
                         preferredX :
-                        backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
+                        backdropWidth - safeAreaEdgeInsets.right - this.props.preferredWidth!,
                     safeAreaEdgeInsets.left
                 ),
                 backdropWidth - safeAreaEdgeInsets.right
             ),
             y: Math.min(
                 Math.max(
-                    preferredY + Popover.preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ? 
+                    preferredY + this.props.preferredHeight! <= backdropHeight - safeAreaEdgeInsets.bottom ? 
                         preferredY :
-                        backdropHeight - safeAreaEdgeInsets.bottom - Popover.preferredHeight,
+                        backdropHeight - safeAreaEdgeInsets.bottom - this.props.preferredHeight!,
                     safeAreaEdgeInsets.top
                 ),
                 backdropHeight - safeAreaEdgeInsets.top
@@ -745,11 +748,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         const popoverSize = {
             width: Math.min(
                 backdropWidth - safeAreaEdgeInsets.right - popoverOrigin.x,
-                Popover.preferredWidth
+                this.props.preferredWidth!
             ),
             height: Math.min(
                 backdropHeight - safeAreaEdgeInsets.bottom - popoverOrigin.y,
-                Popover.preferredHeight
+                this.props.preferredHeight!
             ),
         };
 

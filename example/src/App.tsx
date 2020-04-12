@@ -206,7 +206,7 @@ function MySafeAreaConsumer() {
       </TouchableWithoutFeedback>
 
       <SafePopover
-        animationType={"none"}
+        animationType={"fade"}
         sourceRectHeight={targetRect.height}
         sourceRectWidth={targetRect.width}
         sourceRectX={targetRect.x}
