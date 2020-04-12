@@ -180,7 +180,7 @@ function MySafeAreaConsumer() {
         dismissModalOnBackdropPress={onBackdropPress}
         canOverlapSourceViewRect={false}
       >
-        <Text>I'm the content of this popover!</Text>
+        <Text style={{ padding: 8 }}>I'm the content of this popover!</Text>
       </SafePopover>
     </View>
   );
