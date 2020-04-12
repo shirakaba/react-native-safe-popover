@@ -28,7 +28,7 @@ export enum PopoverArrowDirection {
 
 interface PopoverLayout {
     arrow: {
-        direction: "up"|"down"|"left"|"right",
+        direction: "up"|"down"|"left"|"right"|"none",
         x: number,
         y: number,
         width: number,
@@ -261,7 +261,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         permittedArrowDirections: PopoverArrowDirection[],
         safeAreaEdgeInsets: EdgeInsets,
         sourceRect: { x: number, y: number, width: number, height: number },
-    ): PopoverLayout|null => {
+    ): PopoverLayout => {
         const {
             backdropHeight,
             backdropWidth,
@@ -364,9 +364,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             return nonPreferredLayouts[0]!;
         }
 
-        /* TODO: consider implementing a "last resort" case of just filling the whole available area, potentially overlapping the target */
-
-        return null;
+        return this.calculatePopoverLayoutForArrowDirectionNone(sourceRectClippedMidpoint, backdropWidth, safeAreaEdgeInsets, sourceRectClipped, backdropHeight);
     };
 
     private sortLayoutsByArea(a: PopoverLayout, b: PopoverLayout){
@@ -619,7 +617,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         };
     }
 
-
     private calculatePopoverLayoutForArrowDirectionRight(
         sourceRectClippedMidpoint: { readonly x: number; readonly y: number; },
         backdropWidth: number,
@@ -701,6 +698,75 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         };
     }
 
+    private calculatePopoverLayoutForArrowDirectionNone(
+        sourceRectClippedMidpoint: { readonly x: number; readonly y: number; },
+        backdropWidth: number,
+        safeAreaEdgeInsets: EdgeInsets,
+        sourceRectClipped: { readonly x: number; readonly y: number; readonly width: number; readonly height: number; },
+        backdropHeight: number,
+    ): PopoverLayout {
+        const arrowPoint = {
+            x: 0,
+            y: 0,
+        } as const;
+
+        const preferredX: number = sourceRectClippedMidpoint.x - Popover.preferredWidth / 2;
+        const preferredY: number = sourceRectClippedMidpoint.y - Popover.preferredHeight / 2;
+
+        log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
+
+        const popoverOrigin = {
+            x: Math.min(
+                Math.max(
+                    preferredX + Popover.preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ? 
+                        preferredX :
+                        backdropWidth - safeAreaEdgeInsets.right - Popover.preferredWidth,
+                    safeAreaEdgeInsets.left
+                ),
+                backdropWidth - safeAreaEdgeInsets.right
+            ),
+            y: Math.min(
+                Math.max(
+                    preferredY + Popover.preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ? 
+                        preferredY :
+                        backdropHeight - safeAreaEdgeInsets.bottom - Popover.preferredHeight,
+                    safeAreaEdgeInsets.top
+                ),
+                backdropHeight - safeAreaEdgeInsets.top
+            )
+        };
+
+        const popoverSize = {
+            width: Math.min(
+                backdropWidth - safeAreaEdgeInsets.right - popoverOrigin.x,
+                Popover.preferredWidth
+            ),
+            height: Math.min(
+                backdropHeight - safeAreaEdgeInsets.bottom - popoverOrigin.y,
+                Popover.preferredHeight
+            ),
+        };
+
+        return {
+            arrow: {
+                direction: "none",
+                ...arrowPoint,
+                width: 0,
+                height: 0,
+            },
+            popover: {
+                ...popoverOrigin,
+                ...popoverSize,
+                borderRadii: {
+                    borderTopRightRadius: Popover.borderRadius,
+                    borderTopLeftRadius: Popover.borderRadius,
+                    borderBottomLeftRadius: Popover.borderRadius,
+                    borderBottomRightRadius: Popover.borderRadius,
+                },
+            },
+        };
+    }
+
     render(){
         return (
             <SafeAreaConsumer>
@@ -722,8 +788,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                      * 2) Thus, the screen's safe area insets equally apply to the backdrop. */
                     // const safeAreaWidth: number = backdropWidth - edgeInsets!.left - edgeInsets!.right;
                     // const safeAreaHeight: number = backdropHeight - edgeInsets!.top - edgeInsets!.bottom;
-
-                    // TODO: allow defining edge insets in addition to the implicit safe area insets.
 
                     const sourceRect = {
                         x: this.props.sourceRectX,
@@ -752,8 +816,8 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                             ...sourceRect,
                         }
                     );
-                    log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout!.popover);
-                    log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout!.arrow);
+                    log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout.popover);
+                    log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout.arrow);
 
                     // let arrowDirectionToUse: PopoverArrowDirection;
                     // if(permittedArrowDirections.some(dir => dir === PopoverArrowDirection.down)){
@@ -785,22 +849,22 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                                     style={{
                                         position: "absolute",
                                         backgroundColor: "white",
-                                        ...popoverLayout!.popover.borderRadii,
+                                        ...popoverLayout.popover.borderRadii,
                                         overflow: "hidden",
 
                                         // width: this.state.backdropWidth / 2,
                                         // height: this.state.backdropHeight / 2,
 
-                                        left: popoverLayout?.popover?.x ?? 0,
-                                        top: popoverLayout?.popover?.y ?? 0,
-                                        width: popoverLayout?.popover?.width ?? 0,
-                                        height: popoverLayout?.popover?.height ?? 0,
+                                        left: popoverLayout.popover.x ?? 0,
+                                        top: popoverLayout.popover.y ?? 0,
+                                        width: popoverLayout.popover.width ?? 0,
+                                        height: popoverLayout.popover.height ?? 0,
                                     }}
                                     
                                 >
                                     <TouchableWithoutFeedback
                                         style={{
-                                            ...popoverLayout!.popover.borderRadii,
+                                            ...popoverLayout.popover.borderRadii,
                                             width: "100%",
                                             height: "100%",
                                             overflow: "hidden",
@@ -813,14 +877,15 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                             <Triangle
                                 style={{
                                     position: "absolute",
+                                    display: popoverLayout.arrow.direction === "none" ? "none" : "flex",
 
-                                    left: popoverLayout?.arrow?.x ?? 0,
-                                    top: popoverLayout?.arrow?.y ?? 0,
+                                    left: popoverLayout.arrow.x,
+                                    top: popoverLayout.arrow.y,
                                 }}
-                                width={popoverLayout?.arrow?.width ?? 0}
-                                height={popoverLayout?.arrow?.height ?? 0}
+                                width={popoverLayout.arrow.width}
+                                height={popoverLayout.arrow.height}
                                 color={"white"}
-                                direction={popoverLayout?.arrow?.direction ?? "down"}
+                                direction={popoverLayout.arrow.direction === "none" ? "down" : popoverLayout.arrow.direction}
                             />
                         </Modal>
                     );
