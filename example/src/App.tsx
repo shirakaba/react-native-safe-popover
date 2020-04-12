@@ -7,6 +7,7 @@ function MySafeAreaConsumer() {
   const insets = useSafeArea();
   const [targetRect, setTargetRect] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
   const [popupVisible, setPopupVisible] = React.useState(false);
+  const [lastClickedTarget, setLastClickedTarget] = React.useState<React.RefObject<View>|null>(null);
   const nwTargetRef = React.useRef(null);
   const nTargetRef = React.useRef(null);
   const neTargetRef = React.useRef(null);
@@ -44,6 +45,7 @@ function MySafeAreaConsumer() {
     if(!target){
       return;
     }
+    setLastClickedTarget(targetRef);
     target.measureInWindow(
       (x: number, y: number, width: number, height: number) => {
         console.log(`[target.onTargetPress] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}`);
@@ -59,6 +61,10 @@ function MySafeAreaConsumer() {
   };
 
   const onTargetLayout = (e: LayoutChangeEvent, targetRef: React.RefObject<View>) => {
+    if(targetRef !== lastClickedTarget){
+      // We're only interested in setting the targetRef if this layout event corresponds to the last-clicked target.
+      return;
+    }
     /**
      * The "layout" event gives the latest dimensions of the backdrop, which equal those of the modal,
      * which is full-screen, and so these measurements can reflect the window dimensions.
