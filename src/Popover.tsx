@@ -4,6 +4,15 @@ import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets, useSafeArea, SafeAreaCo
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Triangle } from './Triangle';
 
+const silenceLogs: boolean = true;
+
+function log(message?: any, ...optionalParams: any[]): void {
+    if(silenceLogs){
+      return;
+    }
+    return console.log(message, ...optionalParams);
+}
+
 /**
  * I've removed the cases 'any' and 'unknown' from the UIKit implementation.
  * @see https://developer.apple.com/documentation/uikit/uipopoverarrowdirection
@@ -229,7 +238,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             backdropWidth: width,
             backdropHeight: height,
         }, () => {
-            console.log(`[Popover.onLayout] onLayout setState complete`);
+            log(`[Popover.onLayout] onLayout setState complete`);
         });
     };
 
@@ -243,7 +252,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             backdropWidth,
         } = this.state;
 
-        console.log(`backdrop:`, { width: backdropWidth, height: backdropHeight });
+        log(`backdrop:`, { width: backdropWidth, height: backdropHeight });
         // Note: it is possible for backdrop size to briefly be (0, 0), so cater accordingly.
 
         /* 
@@ -280,7 +289,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
             ),
         } as const;
 
-        console.log(`sourceRectClipped:`, sourceRectClipped);
+        log(`sourceRectClipped:`, sourceRectClipped);
 
         const sourceRectClippedMidpoint = {
             x: sourcePointClipped.x + sourceRectClipped.width / 2,
@@ -354,7 +363,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     }
 
     private readonly onBackdropPress = (event: GestureResponderEvent) => {
-        console.log(`[onBackdropPress]`);
+        log(`[onBackdropPress]`);
 
         if(this.props.dismissModalOnBackdropPress){
             this.props.dismissModalOnBackdropPress();
@@ -623,7 +632,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         const preferredX: number = arrowPoint.x - Popover.preferredWidth;
         const preferredY: number = sourceRectClippedMidpoint.y - Popover.preferredHeight / 2;
 
-        console.log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
+        log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
 
         const popoverOrigin = {
             x: Math.min(
@@ -681,13 +690,13 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         return (
             <SafeAreaConsumer>
                 {(edgeInsets: EdgeInsets|null) => {
-                    console.log(`[edgeInsets]`, edgeInsets);
+                    log(`[edgeInsets]`, edgeInsets);
                     const {
                         permittedArrowDirections,
                         children,
                         popoverMinimumLayoutMargins,
                     } = this.props;
-                    console.log(`[DEBUG] popoverMinimumLayoutMargins`, popoverMinimumLayoutMargins);
+                    log(`[DEBUG] popoverMinimumLayoutMargins`, popoverMinimumLayoutMargins);
                     const {
                         backdropHeight,
                         backdropWidth,
@@ -708,7 +717,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                         height: this.props.sourceRectHeight,
                     } as const;
 
-                    console.log(`Got sourceRect`, sourceRect);
+                    log(`Got sourceRect`, sourceRect);
 
                     // FIXME: handle null case
                     const popoverLayout = this.calculatePopoverLayout(
@@ -728,8 +737,8 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                             ...sourceRect,
                         }
                     );
-                    console.log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout!.popover);
-                    console.log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout!.arrow);
+                    log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout!.popover);
+                    log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout!.arrow);
 
                     // let arrowDirectionToUse: PopoverArrowDirection;
                     // if(permittedArrowDirections.some(dir => dir === PopoverArrowDirection.down)){

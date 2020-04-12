@@ -3,6 +3,15 @@ import { StyleSheet, View, Text, TouchableWithoutFeedback, GestureResponderEvent
 import { SafeAreaProvider, useSafeArea } from "react-native-safe-area-context";
 import SafePopover from 'react-native-safe-popover';
 
+const silenceLogs: boolean = true;
+
+function log(message?: any, ...optionalParams: any[]): void {
+  if(silenceLogs){
+    return;
+  }
+  return console.log(message, ...optionalParams);
+}
+
 function MySafeAreaConsumer() {
   const insets = useSafeArea();
   const [targetRect, setTargetRect] = React.useState({ x: 0, y: 0, width: 0, height: 0 });
@@ -27,10 +36,10 @@ function MySafeAreaConsumer() {
   const unsafeRightRef = React.useRef(null);
 
   const onTargetPress = (event: GestureResponderEvent, targetRef: React.RefObject<View>, whichTarget: string) => {
-    console.log(`[onTargetPress] ${whichTarget}`);
+    log(`[onTargetPress] ${whichTarget}`);
 
     if(whichTarget === "safeArea"){
-      console.log(`[onTargetPress] ${whichTarget} – suppressing display of popup for this particular target.`);
+      log(`[onTargetPress] ${whichTarget} – suppressing display of popup for this particular target.`);
       return;
     }
 
@@ -48,7 +57,7 @@ function MySafeAreaConsumer() {
     setLastClickedTarget(targetRef);
     target.measureInWindow(
       (x: number, y: number, width: number, height: number) => {
-        console.log(`[target.onTargetPress] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}`);
+        log(`[target.onTargetPress] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}`);
 
         setTargetRect({ x, y, width, height });
       }
@@ -78,7 +87,7 @@ function MySafeAreaConsumer() {
     }
     target.measureInWindow(
       (x: number, y: number, width: number, height: number) => {
-        console.log(`[target.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}`);
+        log(`[target.onLayout] measureInWindow:\n- sourceView: ${JSON.stringify({ x, y, width, height })}\n- layout: ${JSON.stringify(layout)}`);
 
         setTargetRect({ x, y, width, height });
       }
