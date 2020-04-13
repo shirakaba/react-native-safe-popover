@@ -17,6 +17,22 @@ function log(message?: any, ...optionalParams: any[]): void {
 
 export interface PopoverProps {
     /**
+     * How far the arrow head extrudes out of the content box.
+     */
+    arrowLength?: number,
+    /**
+     * How broad the arrow is.
+     */
+    arrowBreadth?: number,
+    /**
+     * The border radius of the popover.
+     */
+    borderRadius?: number,
+    /**
+     * The width of the rounded corner that is curved rather than straight. The arrow will avoid this region.
+     */
+    cornerWidth?: number,
+    /**
      * The preferred width of the popover if adequate space is available.
      * Does not alter upon rotation; popover always maintains a portrait orientation.
      */
@@ -123,6 +139,10 @@ interface PopoverState {
 
 export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     public static defaultProps = {
+        arrowLength: 15,
+        arrowBreadth: 30,
+        borderRadius: 15,
+        cornerWidth: 30, // twice the border radius
         preferredWidth: 300,
         preferredHeight: 400,
         popoverColor: "white",
@@ -149,15 +169,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
     private readonly backdropRef: React.RefObject<View> = React.createRef();
 
     /**
-     * How far the arrow head extrudes out of the content box.
-     */
-    private static readonly arrowLength: number = 15;
-    /**
-     * How broad the arrow is.
-     */
-    private static readonly arrowBreadth: number = 30;
-
-    /**
      * NOT IMPLEMENTED
      * The minimum width for a popover of "adequate size".
      * Does not alter upon rotation; popover always maintains a portrait orientation.
@@ -170,9 +181,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
      * Does not alter upon rotation; popover always maintains a portrait orientation.
      */
     // private static readonly minimumHeight: number = 200;
-
-    private static readonly borderRadius: number = 15;
-    private static readonly cornerWidth: number = Popover.borderRadius * 2;
 
     constructor(props: PopoverProps){
         super(props);
@@ -260,10 +268,10 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                         preferredHeight: preferredHeight!,
                         preferredWidth: preferredWidth!,
 
-                        arrowBreadth: Popover.arrowBreadth,
-                        arrowLength: Popover.arrowLength,
-                        cornerWidth: Popover.cornerWidth,
-                        borderRadius: Popover.borderRadius,
+                        arrowBreadth: this.props.arrowBreadth!,
+                        arrowLength: this.props.arrowLength!,
+                        cornerWidth: this.props.cornerWidth!,
+                        borderRadius: this.props.borderRadius!,
                     });
                     log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout.popover);
                     log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout.arrow);
