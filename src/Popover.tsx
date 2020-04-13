@@ -157,35 +157,10 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         },
     };
 
-    /**
-     * TODO: consider implementing
-     * When the popover is onscreen, this property reflects the actual arrow direction.
-     * Before and after presentation, the value of this property is unknown.
-     * @see https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller/1622315-arrowdirection
-     * @default PopoverArrowDirection.any
-     */
-    // private readonly arrowDirection: PopoverArrowDirection = PopoverArrowDirection.down;
-
     private readonly backdropRef: React.RefObject<View> = React.createRef();
-
-    /**
-     * NOT IMPLEMENTED
-     * The minimum width for a popover of "adequate size".
-     * Does not alter upon rotation; popover always maintains a portrait orientation.
-     */
-    // private static readonly minimumWidth: number = 200;
-
-    /**
-     * NOT IMPLEMENTED
-     * The minimum height for a popover of "adequate size".
-     * Does not alter upon rotation; popover always maintains a portrait orientation.
-     */
-    // private static readonly minimumHeight: number = 200;
 
     constructor(props: PopoverProps){
         super(props);
-
-        // const { modalVisible = false } = props;
 
         this.state = {
             backdropWidth: 0,
@@ -340,7 +315,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                     );
                 }}
             </SafeAreaConsumer>
-
         );
     }
 }
