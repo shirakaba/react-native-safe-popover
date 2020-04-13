@@ -1,4 +1,4 @@
-import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets, useSafeArea, SafeAreaContext } from 'react-native-safe-area-context';
+import { EdgeInsets } from 'react-native-safe-area-context';
 import { PopoverArrowDirection } from './arrowDirection';
 
 const silenceLogs: boolean = true;
@@ -9,7 +9,6 @@ function log(message?: any, ...optionalParams: any[]): void {
     }
     return console.log(message, ...optionalParams);
 }
-
 
 export interface PopoverLayout {
     arrow: {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Modal, NativeSyntheticEvent, LayoutChangeEvent, StyleSheet, GestureResponderEvent } from 'react-native';
-import { SafeAreaProvider, SafeAreaConsumer, EdgeInsets, useSafeArea, SafeAreaContext } from 'react-native-safe-area-context';
+import { View, Modal, NativeSyntheticEvent, LayoutChangeEvent, GestureResponderEvent } from 'react-native';
+import { SafeAreaConsumer, EdgeInsets } from 'react-native-safe-area-context';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import { Triangle } from './Triangle';
 import { PopoverArrowDirection } from './arrowDirection';
@@ -268,7 +268,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                     log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout.popover);
                     log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout.arrow);
 
-
                     return (
                         <Modal
                             animationType={this.props.animationType}
@@ -296,9 +295,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                                         backgroundColor: this.props.popoverColor,
                                         ...popoverLayout.popover.borderRadii,
                                         overflow: "hidden",
-
-                                        // width: this.state.backdropWidth / 2,
-                                        // height: this.state.backdropHeight / 2,
 
                                         left: popoverLayout.popover.x ?? 0,
                                         top: popoverLayout.popover.y ?? 0,
