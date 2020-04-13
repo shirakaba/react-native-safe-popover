@@ -124,197 +124,168 @@ export interface PopoverProps {
     popoverMinimumLayoutMargins?: EdgeInsets,
 }
 
-interface PopoverState {
-    // modalVisible: boolean,
-
+export function Popover(props: React.PropsWithChildren<PopoverProps>){
+    const backdropRef = React.useRef<View>(null);
     /**
-     * The width of the backdrop (assumed to equal the width of the screen)
+     * The size of the backdrop (assumed to equal the size of the screen)
      */
-    backdropWidth: number,
-    /**
-     * The height of the backdrop (assumed to equal the height of the screen)
-     */
-    backdropHeight: number,
-}
+    const [backdropSize, setBackdropSize] = React.useState({ width: 0, height: 0 });
 
-export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
-    public static defaultProps = {
-        arrowLength: 15,
-        arrowBreadth: 30,
-        borderRadius: 15,
-        cornerWidth: 30, // twice the border radius
-        preferredWidth: 300,
-        preferredHeight: 400,
-        popoverColor: "white",
-        backdropColor: "rgba(0,0,0,0.25)",
-        animationType: "fade",
-        permittedArrowDirections: [PopoverArrowDirection.down, PopoverArrowDirection.up, PopoverArrowDirection.left, PopoverArrowDirection.right],
-        popoverMinimumLayoutMargins: {
-            top: 10,
-            left: 10,
-            right: 10,
-            bottom: 10,
-        },
-    };
-
-    private readonly backdropRef: React.RefObject<View> = React.createRef();
-
-    constructor(props: PopoverProps){
-        super(props);
-
-        this.state = {
-            backdropWidth: 0,
-            backdropHeight: 0,
-        };
-    }
-
-    private readonly onRequestClose = () => {
+    const onRequestClose = () => {
         // no-op
     };
 
-    private readonly onShow = (event: NativeSyntheticEvent<any>) => {
+    const onShow = (event: NativeSyntheticEvent<any>) => {
         // no-op
     };
 
     /**
      * This event races against the edgeInsets updates. I've seen edgeInsets update after this.
      */
-    private readonly onLayout = (e: LayoutChangeEvent) => {
+    const onLayout = (e: LayoutChangeEvent) => {
         /**
          * The "layout" event gives the latest dimensions of the backdrop, which equal those of the modal,
          * which is full-screen, and so these measurements can reflect the window dimensions.
          */
         const { width, height } = e.nativeEvent.layout;
 
-        this.setState({
-            backdropWidth: width,
-            backdropHeight: height,
-        }, () => {
-            log(`[Popover.onLayout] onLayout setState complete`);
-        });
+        setBackdropSize({ width, height });
     };
 
-    private readonly onBackdropPress = (event: GestureResponderEvent) => {
+    const onBackdropPress = (event: GestureResponderEvent) => {
         log(`[onBackdropPress]`);
 
-        if(this.props.dismissModalOnBackdropPress){
-            this.props.dismissModalOnBackdropPress();
+        if(props.dismissModalOnBackdropPress){
+            props.dismissModalOnBackdropPress();
         }
     };
 
-    render(){
-        return (
-            <SafeAreaConsumer>
-                {(edgeInsets: EdgeInsets|null) => {
-                    log(`[edgeInsets]`, edgeInsets);
-                    const {
-                        permittedArrowDirections,
-                        children,
-                        popoverMinimumLayoutMargins,
-                        preferredHeight,
-                        preferredWidth,
-                    } = this.props;
-                    log(`[DEBUG] popoverMinimumLayoutMargins`, popoverMinimumLayoutMargins);
-                    const {
-                        backdropHeight,
-                        backdropWidth,
-                    } = this.state;
+    return (
+        <SafeAreaConsumer>
+            {(edgeInsets: EdgeInsets|null) => {
+                log(`[edgeInsets]`, edgeInsets);
+                const {
+                    permittedArrowDirections,
+                    children,
+                    popoverMinimumLayoutMargins,
+                    preferredHeight,
+                    preferredWidth,
+                } = props;
+                // log(`[DEBUG] popoverMinimumLayoutMargins`, popoverMinimumLayoutMargins);
 
-                    const sourceRect = {
-                        x: this.props.sourceRectX,
-                        y: this.props.sourceRectY,
-                        width: this.props.sourceRectWidth,
-                        height: this.props.sourceRectHeight,
-                    } as const;
+                const sourceRect = {
+                    x: props.sourceRectX,
+                    y: props.sourceRectY,
+                    width: props.sourceRectWidth,
+                    height: props.sourceRectHeight,
+                } as const;
 
-                    log(`Got sourceRect`, sourceRect);
+                log(`Got sourceRect`, sourceRect);
 
-                    const popoverLayout = calculatePopoverLayout({
-                        permittedArrowDirections: permittedArrowDirections!,
-                        safeAreaEdgeInsets: {
-                            left: Math.max(edgeInsets?.left ?? 0, popoverMinimumLayoutMargins?.left ?? 0),
-                            top: Math.max(edgeInsets?.top ?? 0, popoverMinimumLayoutMargins?.top ?? 0),
-                            bottom: Math.max(edgeInsets?.bottom ?? 0, popoverMinimumLayoutMargins?.bottom ?? 0),
-                            right: Math.max(edgeInsets?.right ?? 0, popoverMinimumLayoutMargins?.right ?? 0),
-                        },
-                        sourceRect,
-                        backdropHeight,
-                        backdropWidth,
-                        preferredHeight: preferredHeight!,
-                        preferredWidth: preferredWidth!,
+                const popoverLayout = calculatePopoverLayout({
+                    permittedArrowDirections: permittedArrowDirections!,
+                    safeAreaEdgeInsets: {
+                        left: Math.max(edgeInsets?.left ?? 0, popoverMinimumLayoutMargins!.left),
+                        top: Math.max(edgeInsets?.top ?? 0, popoverMinimumLayoutMargins!.top),
+                        bottom: Math.max(edgeInsets?.bottom ?? 0, popoverMinimumLayoutMargins!.bottom),
+                        right: Math.max(edgeInsets?.right ?? 0, popoverMinimumLayoutMargins!.right),
+                    },
+                    sourceRect,
+                    backdropHeight: backdropSize.height,
+                    backdropWidth: backdropSize.width,
+                    preferredHeight: preferredHeight!,
+                    preferredWidth: preferredWidth!,
 
-                        arrowBreadth: this.props.arrowBreadth!,
-                        arrowLength: this.props.arrowLength!,
-                        cornerWidth: this.props.cornerWidth!,
-                        borderRadius: this.props.borderRadius!,
-                    });
-                    log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout.popover);
-                    log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout.arrow);
+                    arrowBreadth: props.arrowBreadth!,
+                    arrowLength: props.arrowLength!,
+                    cornerWidth: props.cornerWidth!,
+                    borderRadius: props.borderRadius!,
+                });
+                log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout.popover);
+                log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout.arrow);
 
-                    return (
-                        <Modal
-                            animationType={this.props.animationType}
-                            transparent={true}
-                            visible={this.props.modalVisible}
-                            onRequestClose={this.onRequestClose}
-                            onShow={this.onShow}
-                            supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}
+                return (
+                    <Modal
+                        animationType={props.animationType}
+                        transparent={true}
+                        visible={props.modalVisible}
+                        onRequestClose={onRequestClose}
+                        onShow={onShow}
+                        supportedOrientations={['portrait', 'portrait-upside-down', 'landscape', 'landscape-left', 'landscape-right']}
+                    >
+                        {/* Backdrop */}
+                        <TouchableWithoutFeedback
+                            ref={backdropRef}
+                            onPress={onBackdropPress}
+                            style={{
+                                backgroundColor: props.backdropColor,
+                                width: "100%",
+                                height: "100%",
+                            }}
+                            onLayout={(event) => onLayout(event)}
                         >
-                            {/* Backdrop */}
-                            <TouchableWithoutFeedback
-                                ref={this.backdropRef}
-                                onPress={this.onBackdropPress}
-                                style={{
-                                    backgroundColor: this.props.backdropColor,
-                                    width: "100%",
-                                    height: "100%",
-                                }}
-                                onLayout={(event) => this.onLayout(event)}
-                            >
-                                {/* Popover */}
-                                <View
-                                    style={{
-                                        position: "absolute",
-                                        backgroundColor: this.props.popoverColor,
-                                        ...popoverLayout.popover.borderRadii,
-                                        overflow: "hidden",
-
-                                        left: popoverLayout.popover.x ?? 0,
-                                        top: popoverLayout.popover.y ?? 0,
-                                        width: popoverLayout.popover.width ?? 0,
-                                        height: popoverLayout.popover.height ?? 0,
-                                    }}
-                                    
-                                >
-                                    <TouchableWithoutFeedback
-                                        style={{
-                                            ...popoverLayout.popover.borderRadii,
-                                            width: "100%",
-                                            height: "100%",
-                                            overflow: "hidden",
-                                        }}
-                                    >
-                                        {children}
-                                    </TouchableWithoutFeedback>
-                                </View>
-                            </TouchableWithoutFeedback>
-                            <Triangle
+                            {/* Popover */}
+                            <View
                                 style={{
                                     position: "absolute",
-                                    display: popoverLayout.arrow.direction === "none" ? "none" : "flex",
+                                    backgroundColor: props.popoverColor,
+                                    ...popoverLayout.popover.borderRadii,
+                                    overflow: "hidden",
 
-                                    left: popoverLayout.arrow.x,
-                                    top: popoverLayout.arrow.y,
+                                    left: popoverLayout.popover.x,
+                                    top: popoverLayout.popover.y,
+                                    width: popoverLayout.popover.width,
+                                    height: popoverLayout.popover.height,
                                 }}
-                                width={popoverLayout.arrow.width}
-                                height={popoverLayout.arrow.height}
-                                color={this.props.popoverColor}
-                                direction={popoverLayout.arrow.direction === "none" ? "down" : popoverLayout.arrow.direction}
-                            />
-                        </Modal>
-                    );
-                }}
-            </SafeAreaConsumer>
-        );
-    }
+                                
+                            >
+                                <TouchableWithoutFeedback
+                                    style={{
+                                        ...popoverLayout.popover.borderRadii,
+                                        width: "100%",
+                                        height: "100%",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    {children}
+                                </TouchableWithoutFeedback>
+                            </View>
+                        </TouchableWithoutFeedback>
+                        <Triangle
+                            style={{
+                                position: "absolute",
+                                display: popoverLayout.arrow.direction === "none" ? "none" : "flex",
+
+                                left: popoverLayout.arrow.x,
+                                top: popoverLayout.arrow.y,
+                            }}
+                            width={popoverLayout.arrow.width}
+                            height={popoverLayout.arrow.height}
+                            color={props.popoverColor}
+                            direction={popoverLayout.arrow.direction === "none" ? "down" : popoverLayout.arrow.direction}
+                        />
+                    </Modal>
+                );
+            }}
+        </SafeAreaConsumer>
+    );
 }
+
+Popover.defaultProps = {
+    arrowLength: 15,
+    arrowBreadth: 30,
+    borderRadius: 15,
+    cornerWidth: 30, // twice the border radius
+    preferredWidth: 300,
+    preferredHeight: 400,
+    popoverColor: "white",
+    backdropColor: "rgba(0,0,0,0.25)",
+    animationType: "fade",
+    permittedArrowDirections: [PopoverArrowDirection.down, PopoverArrowDirection.up, PopoverArrowDirection.left, PopoverArrowDirection.right],
+    popoverMinimumLayoutMargins: {
+        top: 10,
+        left: 10,
+        right: 10,
+        bottom: 10,
+    },
+};
