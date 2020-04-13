@@ -196,6 +196,7 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
      * Does not alter upon rotation; popover always maintains a portrait orientation.
      */
     // private static readonly minimumWidth: number = 200;
+    
     /**
      * NOT IMPLEMENTED
      * The minimum height for a popover of "adequate size".
@@ -225,29 +226,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         // no-op
     };
 
-    // componentDidUpdate
-
-    // shouldComponentUpdate(nextProps: Readonly<PopoverProps>, nextState: Readonly<PopoverState>, nextContext: any): boolean {
-    //     const nextModalVisible: boolean = !!nextProps.modalVisible;
-    //     const currentModalVisible: boolean = !!this.props.modalVisible;
-
-    //     if(nextModalVisible !== currentModalVisible){
-    //         this.setState({ modalVisible: nextModalVisible });
-    //     }
-
-    //     return true;
-    // }
-
-    // /**
-    //  * Instance method to set the visibility of the modal.
-    //  * 
-    //  * @param modalVisible whether the modal is visible (true) or hidden (false)
-    //  * @param callback optional callback to run after setState() completes.
-    //  */
-    // public setVisible = (modalVisible: boolean, callback?: () => void) => {
-    //     this.setState({ modalVisible }, callback);
-    // };
-
     /**
      * This event races against the edgeInsets updates. I've seen edgeInsets update after this.
      */
@@ -266,6 +244,11 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
         });
     };
 
+    /** 
+     * ==ASSUMPTIONS==
+     * 1) We're using Modal, so the backdrop and screen dimensions are exactly the same.
+     * 2) Thus, the screen's safe area insets equally apply to the backdrop.
+     */
     private readonly calculatePopoverLayout = (
         permittedArrowDirections: PopoverArrowDirection[],
         safeAreaEdgeInsets: EdgeInsets,
@@ -792,12 +775,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                         backdropWidth,
                     } = this.state;
 
-                    /* ==ASSUMPTIONS==
-                     * 1) We're using Modal, so the backdrop and the screen are exactly the same.
-                     * 2) Thus, the screen's safe area insets equally apply to the backdrop. */
-                    // const safeAreaWidth: number = backdropWidth - edgeInsets!.left - edgeInsets!.right;
-                    // const safeAreaHeight: number = backdropHeight - edgeInsets!.top - edgeInsets!.bottom;
-
                     const sourceRect = {
                         x: this.props.sourceRectX,
                         y: this.props.sourceRectY,
@@ -807,7 +784,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
 
                     log(`Got sourceRect`, sourceRect);
 
-                    // FIXME: handle null case
                     const popoverLayout = this.calculatePopoverLayout(
                         permittedArrowDirections!,
                         {
@@ -827,10 +803,6 @@ export class Popover extends React.PureComponent<PopoverProps, PopoverState> {
                     );
                     log(`[POPOVER] Got popoverLayout.popover:`, popoverLayout.popover);
                     log(`[ARROW  ] Got popoverLayout.arrow  :`, popoverLayout.arrow);
-
-                    // let arrowDirectionToUse: PopoverArrowDirection;
-                    // if(permittedArrowDirections.some(dir => dir === PopoverArrowDirection.down)){
-                    // }
 
 
                     return (
