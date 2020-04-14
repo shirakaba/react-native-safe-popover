@@ -32,7 +32,7 @@ export interface PopoverLayout {
     },
 }
 
-interface CalculatePopoverLayoutParams {
+export interface CalculatePopoverLayoutParams {
     permittedArrowDirections: PopoverArrowDirection[],
     safeAreaEdgeInsets: EdgeInsets,
     sourceRect: { x: number, y: number, width: number, height: number },

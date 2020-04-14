@@ -1,6 +1,6 @@
 {
   "name": "react-native-safe-popover",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "A faithful JS-only port of UIPopoverPresentationController, which respects the safe area, to React Native.",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -93,7 +93,10 @@
       ]
     }
   },
-  "eslintIgnore": ["node_modules/", "lib/"],
+  "eslintIgnore": [
+    "node_modules/",
+    "lib/"
+  ],
   "prettier": {
     "singleQuote": true,
     "tabWidth": 2,
@@ -120,6 +123,11 @@
   "@react-native-community/bob": {
     "source": "src",
     "output": "lib",
-    "targets": ["commonjs", "module", "typescript"]
-  }
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  },
+  "dependencies": {}
 }
