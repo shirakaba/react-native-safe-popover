@@ -80,9 +80,13 @@ export interface PopoverProps {
      * In other words, the y-offset from the backdrop origin point.
      */
     sourceRectY: number,
-
-    dismissModalOnBackdropPress?: () => void,
     /**
+     * A callback called upon the backdrop (the Modal background) being pressed. If you wish to close the Modal upon backdrop
+     * press, you can update the `modalVisible` prop during this callback.
+     */
+    onBackdropPress?: () => void,
+    /**
+     * Whether the Modal (which the Popover is presented upon) is visible or not.
      * @default false
      */
     modalVisible?: boolean,
@@ -106,7 +110,6 @@ export interface PopoverProps {
      * @default [PopoverArrowDirection.down, PopoverArrowDirection.up, PopoverArrowDirection.left, PopoverArrowDirection.right]
      */
     permittedArrowDirections?: PopoverArrowDirection[],
-
     /**
      * The margins that define the portion of the screen in which it is permissible to display the popover.
      * 
@@ -122,6 +125,17 @@ export interface PopoverProps {
      * @see https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller/1622323-popoverlayoutmargins?language=objc
      */
     popoverMinimumLayoutMargins?: EdgeInsets,
+    /** An optional alternative to rendering simply using React.children. This passes in some props relating to the Popover
+      * that may be of use to the child. Will be used instead of React.children if both are provided. */
+    renderPopoverContent?: (props: PopoverContentProps) => React.ReactNode;
+}
+
+export interface PopoverContentProps {
+    /**
+     * The direction of the arrow coming out of the Popover. Will be "none" only in the last-resort case of having to overlap
+     * the target rectangle to satisfy constraints.
+     */
+    arrowDirection: "up"|"down"|"left"|"right"|"none",
 }
 
 export function Popover(props: React.PropsWithChildren<PopoverProps>){
@@ -155,8 +169,8 @@ export function Popover(props: React.PropsWithChildren<PopoverProps>){
     const onBackdropPress = (event: GestureResponderEvent) => {
         log(`[onBackdropPress]`);
 
-        if(props.dismissModalOnBackdropPress){
-            props.dismissModalOnBackdropPress();
+        if(props.onBackdropPress){
+            props.onBackdropPress();
         }
     };
 
@@ -170,6 +184,7 @@ export function Popover(props: React.PropsWithChildren<PopoverProps>){
                     popoverMinimumLayoutMargins,
                     preferredHeight,
                     preferredWidth,
+                    renderPopoverContent,
                 } = props;
                 // log(`[DEBUG] popoverMinimumLayoutMargins`, popoverMinimumLayoutMargins);
 
@@ -247,7 +262,13 @@ export function Popover(props: React.PropsWithChildren<PopoverProps>){
                                         overflow: "hidden",
                                     }}
                                 >
-                                    {children}
+                                    {
+                                        renderPopoverContent ? 
+                                            renderPopoverContent({
+                                                arrowDirection: popoverLayout.arrow.direction
+                                            }) :
+                                            children
+                                    }
                                 </TouchableWithoutFeedback>
                             </View>
                         </TouchableWithoutFeedback>

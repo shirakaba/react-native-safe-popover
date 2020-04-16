@@ -212,7 +212,7 @@ function MySafeAreaConsumer() {
         sourceRectX={targetRect.x}
         sourceRectY={targetRect.y}
         modalVisible={popupVisible}
-        dismissModalOnBackdropPress={onBackdropPress}
+        onBackdropPress={onBackdropPress}
         canOverlapSourceViewRect={false}
       >
         <Text style={{ padding: 8 }}>I'm the content of this popover!</Text>
