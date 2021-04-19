@@ -100,7 +100,7 @@ MIT
 
 ## More of my stuff
 
-<img src="/github/LinguaBrowse.PNG" width="64px"/>
+<img src="/github/LinguaBrowse.png" width="64px"/>
 
 * [LinguaBrowse](https://itunes.apple.com/us/app/linguabrowse/id1281350165?ls=1&mt=8) (iOS) on the App Store – made in React Native + TypeScript
 * [LinguaBrowse](https://itunes.apple.com/gb/app/linguabrowse/id1422884180?mt=12) (macOS Safari Extension) on the App Store – made in Swift + TypeScript
