@@ -32,7 +32,7 @@ npx pod-install
 
 ## Appearance
 
-These screenshots come from the included demo.
+These screenshots come from the included demo. Red areas indicate the "unsafe" area; green, the "safe" area; and blue, some source rectangles that can be tapped to present the popover.
 
 On the "happy path", the popover will simply fill the available space and attain its preferred size (see the screenshots below, where we've tapped on the "bottom" and "right" source rectangles).
 
@@ -59,13 +59,13 @@ So in summary, the whole popover stays within the safe area (and also within the
         </tr>
         <tr>
             <td align="center" valign="middle">
-                Bottom (fits)
+                Bottom
             </td>
             <td align="center" valign="middle">
-                Right (fits)
+                Right
             </td>
             <td align="center" valign="middle">
-                Top-left (respects 10px margins)
+                Top-left
             </td>
         </tr>
     </tbody>
