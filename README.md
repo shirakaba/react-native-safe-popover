@@ -2,6 +2,13 @@
 
 A faithful JS-only imitation of UIKit's UIPopoverPresentationController, which respects the safe area, to React Native.
 
+## Requirements
+
+react-native Version | react-native-safe-popover version
+------------ | -------------
+`~0.64.0` | `^1.1.0`
+`~0.61.4` | `^0.2.0`
+
 ## Installation
 
 ```sh
@@ -51,6 +58,21 @@ So in summary, the whole popover stays within the safe area (and also within the
     </tbody>
 </table>
 
+These screenshots come from the real-world iOS app, [LinguaBrowse](https://itunes.apple.com/us/app/linguabrowse/id1281350165?ls=1&mt=8), and demonstrate how it seamlessly handles `<WebView>` (or equally `<ScrollView>`) components:
+
+<table>
+    <tbody>
+        <tr>
+            <td align="center" valign="middle">
+                <img width="300px" src="/github/realworld-1.png"/>
+            </td>
+            <td align="center" valign="middle">
+                <img width="300px" src="/github/realworld-2.png"/>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
 ## Usage
 
 * As this is an imitation of [UIPopoverPresentationController](https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller), the APIs are generally modelled on those of it.
@@ -67,9 +89,10 @@ So in summary, the whole popover stays within the safe area (and also within the
 * **How do you dismiss it?** Toggle its `modalVisible` property to `false`. SafePopover exposes an `onBackdropPress` prop in case you want to toggle its `modalVisible` property to `false` upon the user pressing the backdrop.
 
 ```tsx
+import React from "react";
 import SafePopover from "react-native-safe-popover";
 
-export function Example(targetRect: { x: number, y: number, height: number, width: number }) {
+export function Example(targetRect: { x: number, y: number, height: number, width: number }){
     const [popupVisible, setPopupVisible] = React.useState(false);
     const { x, y, height, width } = targetRect;
 
