@@ -1,5 +1,15 @@
 # react-native-safe-popover
 
+<p align="center">
+    <a href="https://badge.fury.io/js/react-native-safe-popover"><img src="https://badge.fury.io/js/react-native-safe-popover.svg" alt="npm version" height="18"></a>
+    <a href="https://opensource.org/licenses/mit-license.php">
+        <img src="https://badges.frapsoft.com/os/mit/mit.png?v=103"/>
+    </a>
+    <a href="https://twitter.com/intent/follow?screen_name=LinguaBrowse">
+        <img src="https://img.shields.io/twitter/follow/LinguaBrowse.svg?style=social&logo=twitter"/>
+    </a>
+</p>
+
 A faithful JS-only imitation of UIKit's UIPopoverPresentationController, which respects the safe area, to React Native.
 
 ## Requirements
