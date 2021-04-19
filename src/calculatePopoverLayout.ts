@@ -1,66 +1,71 @@
-import { EdgeInsets } from 'react-native-safe-area-context';
-import { PopoverArrowDirection } from './arrowDirection';
+import { EdgeInsets } from "react-native-safe-area-context";
+import { PopoverArrowDirection } from "./arrowDirection";
 
 const silenceLogs: boolean = true;
 
 function log(message?: any, ...optionalParams: any[]): void {
-    if(silenceLogs){
-      return;
+    if (silenceLogs) {
+        return;
     }
     return console.log(message, ...optionalParams);
 }
 
 export interface PopoverLayout {
     arrow: {
-        direction: "up"|"down"|"left"|"right"|"none",
-        x: number,
-        y: number,
-        width: number,
-        height: number,
-    },
+        direction: "up" | "down" | "left" | "right" | "none";
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
     popover: {
-        x: number,
-        y: number,
-        width: number,
-        height: number,
+        x: number;
+        y: number;
+        width: number;
+        height: number;
         borderRadii: {
-            borderTopRightRadius: number,
-            borderTopLeftRadius: number,
-            borderBottomLeftRadius: number,
-            borderBottomRightRadius: number,
-        },
-    },
+            borderTopRightRadius: number;
+            borderTopLeftRadius: number;
+            borderBottomLeftRadius: number;
+            borderBottomRightRadius: number;
+        };
+    };
 }
 
 export interface CalculatePopoverLayoutParams {
-    permittedArrowDirections: PopoverArrowDirection[],
-    safeAreaEdgeInsets: EdgeInsets,
-    sourceRect: { x: number, y: number, width: number, height: number },
-    backdropHeight: number,
-    backdropWidth: number,
-    preferredHeight: number,
-    preferredWidth: number,
-    arrowBreadth: number,
-    arrowLength: number,
-    cornerWidth: number,
-    borderRadius: number,
+    permittedArrowDirections: PopoverArrowDirection[];
+    safeAreaEdgeInsets: EdgeInsets;
+    sourceRect: { x: number; y: number; width: number; height: number };
+    backdropHeight: number;
+    backdropWidth: number;
+    preferredHeight: number;
+    preferredWidth: number;
+    arrowBreadth: number;
+    arrowLength: number;
+    cornerWidth: number;
+    borderRadius: number;
 }
 
 interface CalculatePopoverLayoutForArrowDirectionParams {
-    sourceRectClippedMidpoint: { readonly x: number; readonly y: number; },
-    backdropWidth: number,
-    safeAreaEdgeInsets: EdgeInsets,
-    sourceRectClipped: { readonly x: number; readonly y: number; readonly width: number; readonly height: number; },
-    backdropHeight: number,
-    preferredHeight: number,
-    preferredWidth: number,
-    arrowBreadth: number,
-    arrowLength: number,
-    cornerWidth: number,
-    borderRadius: number,
+    sourceRectClippedMidpoint: { readonly x: number; readonly y: number };
+    backdropWidth: number;
+    safeAreaEdgeInsets: EdgeInsets;
+    sourceRectClipped: {
+        readonly x: number;
+        readonly y: number;
+        readonly width: number;
+        readonly height: number;
+    };
+    backdropHeight: number;
+    preferredHeight: number;
+    preferredWidth: number;
+    arrowBreadth: number;
+    arrowLength: number;
+    cornerWidth: number;
+    borderRadius: number;
 }
 
-/** 
+/**
  * ==ASSUMPTIONS==
  * 1) We're using Modal, so the backdrop and screen dimensions are exactly the same.
  * 2) Thus, the screen's safe area insets equally apply to the backdrop.
@@ -77,24 +82,22 @@ export function calculatePopoverLayout({
     arrowLength,
     cornerWidth,
     borderRadius,
-}: CalculatePopoverLayoutParams): PopoverLayout 
-{
-
-    log(`backdrop:`, { width: backdropWidth, height: backdropHeight });
+}: CalculatePopoverLayoutParams): PopoverLayout {
+    log("backdrop:", { width: backdropWidth, height: backdropHeight });
     // Note: it is possible for backdrop size to briefly be (0, 0), so cater accordingly.
 
-    /* 
-        * Clip off any parts of the source rect that exit the safe area.
-        * Should the rect's x-pos or y-pos exits the safe area entirely, clip to the closest safe x-pos or y-pos.
-        */
+    /*
+     * Clip off any parts of the source rect that exit the safe area.
+     * Should the rect's x-pos or y-pos exits the safe area entirely, clip to the closest safe x-pos or y-pos.
+     */
     const sourcePointClipped = {
         x: Math.min(
             Math.max(sourceRect.x, safeAreaEdgeInsets.left),
-            Math.max(backdropWidth - safeAreaEdgeInsets.right, safeAreaEdgeInsets.left)
+            Math.max(backdropWidth - safeAreaEdgeInsets.right, safeAreaEdgeInsets.left),
         ),
         y: Math.min(
             Math.max(sourceRect.y, safeAreaEdgeInsets.top),
-            Math.max(backdropHeight - safeAreaEdgeInsets.bottom, safeAreaEdgeInsets.top)
+            Math.max(backdropHeight - safeAreaEdgeInsets.bottom, safeAreaEdgeInsets.top),
         ),
     } as const;
 
@@ -104,20 +107,20 @@ export function calculatePopoverLayout({
         width: Math.max(
             Math.min(
                 sourceRect.width - Math.abs(sourcePointClipped.x - sourceRect.x),
-                backdropWidth - safeAreaEdgeInsets.left - safeAreaEdgeInsets.right
+                backdropWidth - safeAreaEdgeInsets.left - safeAreaEdgeInsets.right,
             ),
-            0
+            0,
         ),
         height: Math.max(
             Math.min(
                 sourceRect.height - Math.abs(sourcePointClipped.y - sourceRect.y),
-                backdropHeight - safeAreaEdgeInsets.top - safeAreaEdgeInsets.bottom
+                backdropHeight - safeAreaEdgeInsets.top - safeAreaEdgeInsets.bottom,
             ),
-            0
+            0,
         ),
     } as const;
 
-    log(`sourceRectClipped:`, sourceRectClipped);
+    log("sourceRectClipped:", sourceRectClipped);
 
     const sourceRectClippedMidpoint = {
         x: sourcePointClipped.x + sourceRectClipped.width / 2,
@@ -146,11 +149,11 @@ export function calculatePopoverLayout({
     } as const;
 
     const layouts = [];
-    for(let i = 0; i < permittedArrowDirections.length; i++){
+    for (let i = 0; i < permittedArrowDirections.length; i++) {
         const permittedDirection: PopoverArrowDirection = permittedArrowDirections[i];
 
-        let layout: PopoverLayout|null = null;
-        switch(permittedDirection){
+        let layout: PopoverLayout | null = null;
+        switch (permittedDirection) {
             case PopoverArrowDirection.down:
                 layout = permutations.down;
                 break;
@@ -164,10 +167,10 @@ export function calculatePopoverLayout({
                 layout = permutations.right;
                 break;
         }
-        if(layout === null){
+        if (layout === null) {
             continue;
         }
-        if(layout.popover.height === preferredHeight && layout.popover.width === preferredWidth){
+        if (layout.popover.height === preferredHeight && layout.popover.width === preferredWidth) {
             // First layout in priority order to satisfy constraints completely, so can bail out.
             return layout;
         }
@@ -177,24 +180,24 @@ export function calculatePopoverLayout({
     /* Note that Array.prototype.sort() mutates the array itself. */
     layouts.sort(sortLayoutsByArea);
 
-    if(layouts.length !== 0){
+    if (layouts.length !== 0) {
         return layouts[0];
     }
 
     /* Now we fall back to non-preferred directions. This might be undesirable, but likely better than showing nothing at all. */
     const nonPreferredLayouts = Object.keys(permutations)
-    .map(directionName => permutations[directionName as keyof typeof permutations])
-    .filter(layout => layout !== null)
-    .sort(sortLayoutsByArea as any);
+        .map(directionName => permutations[directionName as keyof typeof permutations])
+        .filter(layout => layout !== null)
+        .sort(sortLayoutsByArea as any);
 
-    if(nonPreferredLayouts.length > 0){
+    if (nonPreferredLayouts.length > 0) {
         return nonPreferredLayouts[0]!;
     }
 
     return calculatePopoverLayoutForArrowDirectionNone(params);
-};
+}
 
-function sortLayoutsByArea(a: PopoverLayout, b: PopoverLayout){
+function sortLayoutsByArea(a: PopoverLayout, b: PopoverLayout) {
     /**
      * Sort in descending order of area, e.g. to produce: [123, 456]
      * If any two layouts are found to have exactly the same area, then they'll be left in-place (still in preference order).
@@ -215,22 +218,21 @@ function calculatePopoverLayoutForArrowDirectionDown({
     arrowLength,
     cornerWidth,
     borderRadius,
-}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout|null
-{
+}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout | null {
     const arrowPoint = {
         x: Math.max(
             Math.min(
                 sourceRectClippedMidpoint.x - arrowBreadth / 2,
-                backdropWidth - safeAreaEdgeInsets.right - arrowBreadth
+                backdropWidth - safeAreaEdgeInsets.right - arrowBreadth,
             ),
-            safeAreaEdgeInsets.left
+            safeAreaEdgeInsets.left,
         ),
         y: Math.max(
             Math.min(
                 sourceRectClipped.y - arrowLength,
-                backdropHeight - safeAreaEdgeInsets.bottom - arrowLength
+                backdropHeight - safeAreaEdgeInsets.bottom - arrowLength,
             ),
-            safeAreaEdgeInsets.top
+            safeAreaEdgeInsets.top,
         ),
     } as const;
 
@@ -239,34 +241,23 @@ function calculatePopoverLayoutForArrowDirectionDown({
 
     const popoverOrigin = {
         x: Math.max(
-            preferredX + preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
-                preferredX :
-                backdropWidth - safeAreaEdgeInsets.right - preferredWidth,
-            safeAreaEdgeInsets.left
+            preferredX + preferredWidth <= backdropWidth - safeAreaEdgeInsets.right
+                ? preferredX
+                : backdropWidth - safeAreaEdgeInsets.right - preferredWidth,
+            safeAreaEdgeInsets.left,
         ),
-        y: Math.max(
-            preferredY,
-            safeAreaEdgeInsets.top
-        ),
+        y: Math.max(preferredY, safeAreaEdgeInsets.top),
     };
 
     const popoverSize = {
-        width: Math.min(
-            backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-            preferredWidth
-        ),
-        height: Math.min(
-            arrowPoint.y - safeAreaEdgeInsets.top,
-            preferredHeight
-        ),
+        width: Math.min(backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right, preferredWidth),
+        height: Math.min(arrowPoint.y - safeAreaEdgeInsets.top, preferredHeight),
     };
 
-    const borderBottomLeftRadius: number = arrowPoint.x <= popoverOrigin.x + cornerWidth ?
-        0 :
-        borderRadius;
-    const borderBottomRightRadius: number = arrowPoint.x >= popoverOrigin.x + popoverSize.width - cornerWidth ?
-        0 :
-        borderRadius;
+    const borderBottomLeftRadius: number =
+        arrowPoint.x <= popoverOrigin.x + cornerWidth ? 0 : borderRadius;
+    const borderBottomRightRadius: number =
+        arrowPoint.x >= popoverOrigin.x + popoverSize.width - cornerWidth ? 0 : borderRadius;
 
     return {
         arrow: {
@@ -301,22 +292,21 @@ function calculatePopoverLayoutForArrowDirectionUp({
     arrowLength,
     cornerWidth,
     borderRadius,
-}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout|null
-{
+}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout | null {
     const arrowPoint = {
         x: Math.max(
             Math.min(
                 sourceRectClippedMidpoint.x - arrowBreadth / 2,
-                backdropWidth - safeAreaEdgeInsets.right - arrowBreadth
+                backdropWidth - safeAreaEdgeInsets.right - arrowBreadth,
             ),
-            safeAreaEdgeInsets.left
+            safeAreaEdgeInsets.left,
         ),
         y: Math.max(
             Math.min(
                 sourceRectClipped.y + sourceRectClipped.height,
-                backdropHeight - safeAreaEdgeInsets.bottom - arrowLength
+                backdropHeight - safeAreaEdgeInsets.bottom - arrowLength,
             ),
-            safeAreaEdgeInsets.top
+            safeAreaEdgeInsets.top,
         ),
     } as const;
 
@@ -325,34 +315,23 @@ function calculatePopoverLayoutForArrowDirectionUp({
 
     const popoverOrigin = {
         x: Math.max(
-            preferredX + preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ?
-                preferredX :
-                backdropWidth - safeAreaEdgeInsets.right - preferredWidth,
-            safeAreaEdgeInsets.left
+            preferredX + preferredWidth <= backdropWidth - safeAreaEdgeInsets.right
+                ? preferredX
+                : backdropWidth - safeAreaEdgeInsets.right - preferredWidth,
+            safeAreaEdgeInsets.left,
         ),
-        y: Math.min(
-            preferredY,
-            backdropHeight - safeAreaEdgeInsets.bottom
-        ),
+        y: Math.min(preferredY, backdropHeight - safeAreaEdgeInsets.bottom),
     };
 
     const popoverSize = {
-        width: Math.min(
-            backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-            preferredWidth
-        ),
-        height: Math.min(
-            (backdropHeight - safeAreaEdgeInsets.bottom) - preferredY,
-            preferredHeight
-        ),
+        width: Math.min(backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right, preferredWidth),
+        height: Math.min(backdropHeight - safeAreaEdgeInsets.bottom - preferredY, preferredHeight),
     };
 
-    const borderTopLeftRadius: number = arrowPoint.x <= popoverOrigin.x + cornerWidth ?
-        0 :
-        borderRadius;
-    const borderTopRightRadius: number = arrowPoint.x >= popoverOrigin.x + popoverSize.width - cornerWidth ?
-        0 :
-        borderRadius;
+    const borderTopLeftRadius: number =
+        arrowPoint.x <= popoverOrigin.x + cornerWidth ? 0 : borderRadius;
+    const borderTopRightRadius: number =
+        arrowPoint.x >= popoverOrigin.x + popoverSize.width - cornerWidth ? 0 : borderRadius;
 
     return {
         arrow: {
@@ -387,22 +366,21 @@ function calculatePopoverLayoutForArrowDirectionLeft({
     arrowLength,
     cornerWidth,
     borderRadius,
-}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout|null
-{
+}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout | null {
     const arrowPoint = {
         x: Math.max(
             Math.min(
                 sourceRectClipped.x + sourceRectClipped.width,
-                backdropWidth - safeAreaEdgeInsets.right - arrowLength
+                backdropWidth - safeAreaEdgeInsets.right - arrowLength,
             ),
-            safeAreaEdgeInsets.left
+            safeAreaEdgeInsets.left,
         ),
         y: Math.max(
             Math.min(
                 sourceRectClippedMidpoint.y - arrowBreadth / 2,
-                backdropHeight - safeAreaEdgeInsets.bottom - arrowBreadth
+                backdropHeight - safeAreaEdgeInsets.bottom - arrowBreadth,
             ),
-            safeAreaEdgeInsets.top
+            safeAreaEdgeInsets.top,
         ),
     } as const;
 
@@ -412,33 +390,28 @@ function calculatePopoverLayoutForArrowDirectionLeft({
     const popoverOrigin = {
         x: Math.max(
             Math.min(preferredX, backdropWidth - safeAreaEdgeInsets.right),
-            arrowPoint.x + arrowLength
+            arrowPoint.x + arrowLength,
         ),
         y: Math.max(
-            preferredY + preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ?
-                preferredY :
-                backdropHeight - safeAreaEdgeInsets.bottom - preferredHeight,
-            safeAreaEdgeInsets.top
+            preferredY + preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom
+                ? preferredY
+                : backdropHeight - safeAreaEdgeInsets.bottom - preferredHeight,
+            safeAreaEdgeInsets.top,
         ),
     };
 
     const popoverSize = {
-        width: Math.min(
-            backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-            preferredWidth
-        ),
+        width: Math.min(backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right, preferredWidth),
         height: Math.min(
             backdropHeight - safeAreaEdgeInsets.bottom - safeAreaEdgeInsets.top,
-            preferredHeight
+            preferredHeight,
         ),
     };
 
-    const borderTopLeftRadius: number = arrowPoint.y <= popoverOrigin.y + cornerWidth ?
-        0 :
-        borderRadius;
-    const borderBottomLeftRadius: number = arrowPoint.y >= popoverOrigin.y + popoverSize.height - cornerWidth ?
-        0 :
-        borderRadius;
+    const borderTopLeftRadius: number =
+        arrowPoint.y <= popoverOrigin.y + cornerWidth ? 0 : borderRadius;
+    const borderBottomLeftRadius: number =
+        arrowPoint.y >= popoverOrigin.y + popoverSize.height - cornerWidth ? 0 : borderRadius;
 
     return {
         arrow: {
@@ -473,40 +446,33 @@ function calculatePopoverLayoutForArrowDirectionRight({
     arrowLength,
     cornerWidth,
     borderRadius,
-}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout|null
-{
+}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout | null {
     const arrowPoint = {
         x: Math.min(
-            Math.max(
-                safeAreaEdgeInsets.left,
-                sourceRectClipped.x - arrowLength,
-            ),
-            backdropWidth - safeAreaEdgeInsets.right - arrowLength
+            Math.max(safeAreaEdgeInsets.left, sourceRectClipped.x - arrowLength),
+            backdropWidth - safeAreaEdgeInsets.right - arrowLength,
         ),
         y: Math.max(
             Math.min(
                 sourceRectClippedMidpoint.y - arrowBreadth / 2,
-                backdropHeight - safeAreaEdgeInsets.bottom - arrowBreadth
+                backdropHeight - safeAreaEdgeInsets.bottom - arrowBreadth,
             ),
-            safeAreaEdgeInsets.top
+            safeAreaEdgeInsets.top,
         ),
     } as const;
 
     const preferredX: number = arrowPoint.x - preferredWidth;
     const preferredY: number = sourceRectClippedMidpoint.y - preferredHeight / 2;
 
-    log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
+    log("[DEBUG] safeAreaEdgeInsets", safeAreaEdgeInsets);
 
     const popoverOrigin = {
-        x: Math.min(
-            Math.max(safeAreaEdgeInsets.left, preferredX),
-            arrowPoint.x
-        ),
+        x: Math.min(Math.max(safeAreaEdgeInsets.left, preferredX), arrowPoint.x),
         y: Math.max(
-            preferredY + preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ?
-                preferredY :
-                backdropHeight - safeAreaEdgeInsets.bottom - preferredHeight,
-            safeAreaEdgeInsets.top
+            preferredY + preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom
+                ? preferredY
+                : backdropHeight - safeAreaEdgeInsets.bottom - preferredHeight,
+            safeAreaEdgeInsets.top,
         ),
     };
 
@@ -514,20 +480,18 @@ function calculatePopoverLayoutForArrowDirectionRight({
         width: Math.min(
             arrowPoint.x - safeAreaEdgeInsets.left,
             backdropWidth - popoverOrigin.x - safeAreaEdgeInsets.right,
-            preferredWidth
+            preferredWidth,
         ),
         height: Math.min(
             backdropHeight - safeAreaEdgeInsets.bottom - safeAreaEdgeInsets.top,
-            preferredHeight
+            preferredHeight,
         ),
     };
 
-    const borderTopRightRadius: number = arrowPoint.y <= popoverOrigin.y + cornerWidth ?
-        0 :
-        borderRadius;
-    const borderBottomRightRadius: number = arrowPoint.y >= popoverOrigin.y + popoverSize.height - cornerWidth ?
-        0 :
-        borderRadius;
+    const borderTopRightRadius: number =
+        arrowPoint.y <= popoverOrigin.y + cornerWidth ? 0 : borderRadius;
+    const borderBottomRightRadius: number =
+        arrowPoint.y >= popoverOrigin.y + popoverSize.height - cornerWidth ? 0 : borderRadius;
 
     return {
         arrow: {
@@ -553,17 +517,12 @@ function calculatePopoverLayoutForArrowDirectionNone({
     sourceRectClippedMidpoint,
     backdropWidth,
     safeAreaEdgeInsets,
-    sourceRectClipped,
     backdropHeight,
 
     preferredWidth,
     preferredHeight,
-    arrowBreadth,
-    arrowLength,
-    cornerWidth,
     borderRadius,
-}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout
-{
+}: CalculatePopoverLayoutForArrowDirectionParams): PopoverLayout {
     const arrowPoint = {
         x: 0,
         y: 0,
@@ -572,37 +531,34 @@ function calculatePopoverLayoutForArrowDirectionNone({
     const preferredX: number = sourceRectClippedMidpoint.x - preferredWidth / 2;
     const preferredY: number = sourceRectClippedMidpoint.y - preferredHeight / 2;
 
-    log(`[DEBUG] safeAreaEdgeInsets`, safeAreaEdgeInsets);
+    log("[DEBUG] safeAreaEdgeInsets", safeAreaEdgeInsets);
 
     const popoverOrigin = {
         x: Math.min(
             Math.max(
-                preferredX + preferredWidth <= backdropWidth - safeAreaEdgeInsets.right ? 
-                    preferredX :
-                    backdropWidth - safeAreaEdgeInsets.right - preferredWidth,
-                safeAreaEdgeInsets.left
+                preferredX + preferredWidth <= backdropWidth - safeAreaEdgeInsets.right
+                    ? preferredX
+                    : backdropWidth - safeAreaEdgeInsets.right - preferredWidth,
+                safeAreaEdgeInsets.left,
             ),
-            backdropWidth - safeAreaEdgeInsets.right
+            backdropWidth - safeAreaEdgeInsets.right,
         ),
         y: Math.min(
             Math.max(
-                preferredY + preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom ? 
-                    preferredY :
-                    backdropHeight - safeAreaEdgeInsets.bottom - preferredHeight,
-                safeAreaEdgeInsets.top
+                preferredY + preferredHeight <= backdropHeight - safeAreaEdgeInsets.bottom
+                    ? preferredY
+                    : backdropHeight - safeAreaEdgeInsets.bottom - preferredHeight,
+                safeAreaEdgeInsets.top,
             ),
-            backdropHeight - safeAreaEdgeInsets.top
-        )
+            backdropHeight - safeAreaEdgeInsets.top,
+        ),
     };
 
     const popoverSize = {
-        width: Math.min(
-            backdropWidth - safeAreaEdgeInsets.right - popoverOrigin.x,
-            preferredWidth
-        ),
+        width: Math.min(backdropWidth - safeAreaEdgeInsets.right - popoverOrigin.x, preferredWidth),
         height: Math.min(
             backdropHeight - safeAreaEdgeInsets.bottom - popoverOrigin.y,
-            preferredHeight
+            preferredHeight,
         ),
     };
 

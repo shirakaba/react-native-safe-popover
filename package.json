@@ -16,6 +16,7 @@
   "scripts": {
     "test": "jest",
     "typescript": "tsc --noEmit",
+    "prettier": "prettier --write \"src/**/*.{t,j}{sx,s}\"",
     "lint": "eslint --ext .js,.ts,.tsx .",
     "prepare": "bob build",
     "release": "release-it",
@@ -76,33 +77,10 @@
       "pre-commit": "yarn lint && yarn typescript"
     }
   },
-  "eslintConfig": {
-    "extends": [
-      "@react-native-community",
-      "prettier"
-    ],
-    "rules": {
-      "prettier/prettier": [
-        "error",
-        {
-          "singleQuote": true,
-          "tabWidth": 2,
-          "trailingComma": "es5",
-          "useTabs": false
-        }
-      ]
-    }
-  },
   "eslintIgnore": [
     "node_modules/",
     "lib/"
   ],
-  "prettier": {
-    "singleQuote": true,
-    "tabWidth": 2,
-    "trailingComma": "es5",
-    "useTabs": false
-  },
   "release-it": {
     "git": {
       "commitMessage": "chore: release %s",
