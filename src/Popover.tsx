@@ -4,10 +4,10 @@ import {
     Modal,
     NativeSyntheticEvent,
     LayoutChangeEvent,
-    GestureResponderEvent,
 } from "react-native";
 import { SafeAreaConsumer, EdgeInsets } from "react-native-safe-area-context";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import GenericTouchable from "react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchable";
 import { Triangle } from "./Triangle";
 import { PopoverArrowDirection } from "./arrowDirection";
 import { calculatePopoverLayout } from "./calculatePopoverLayout";
@@ -145,7 +145,7 @@ export interface PopoverContentProps {
 }
 
 export function Popover(props: React.PropsWithChildren<PopoverProps>) {
-    const backdropRef = React.useRef<View>(null);
+    const backdropRef = React.useRef<GenericTouchable>(null);
     /**
      * The size of the backdrop (assumed to equal the size of the screen)
      */
@@ -175,7 +175,7 @@ export function Popover(props: React.PropsWithChildren<PopoverProps>) {
         setBackdropSize({ width, height });
     };
 
-    const onBackdropPress = (_: GestureResponderEvent) => {
+    const onBackdropPress = () => {
         log(`[onBackdropPress]`);
 
         if (props.onBackdropPress) {
