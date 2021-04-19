@@ -1,11 +1,13 @@
 # react-native-safe-popover
 
-A faithful port of UIPopoverPresentationController, which respects the safe area, to React Native.
+A faithful JS-only imitation of UIKit's UIPopoverPresentationController, which respects the safe area, to React Native.
 
 ## Installation
 
 ```sh
 npm install react-native-safe-popover
+# or
+yarn add react-native-safe-popover
 ```
 
 ## Usage
@@ -13,9 +15,7 @@ npm install react-native-safe-popover
 ```js
 import SafePopover from "react-native-safe-popover";
 
-// ...
-
-const deviceName = await SafePopover.getDeviceName();
+// TODO, sorry!
 ```
 
 ## License
