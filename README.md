@@ -10,7 +10,7 @@
     </a>
 </p>
 
-A faithful JS-only imitation of UIKit's UIPopoverPresentationController, which respects the safe area, to React Native.
+A faithful JS-only imitation of UIKit's [UIPopoverPresentationController](https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller), which respects the safe area, to React Native.
 
 ## Requirements
 
