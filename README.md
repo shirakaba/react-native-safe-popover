@@ -4,7 +4,7 @@ A faithful JS-only imitation of UIKit's UIPopoverPresentationController, which r
 
 ## Requirements
 
-react-native Version | react-native-safe-popover version
+`react-native` version | `react-native-safe-popover` version
 ------------ | -------------
 `~0.64.0` | `^1.1.0`
 `~0.61.4` | `^0.2.0`
@@ -12,9 +12,12 @@ react-native Version | react-native-safe-popover version
 ## Installation
 
 ```sh
-yarn add react-native-safe-popover
+yarn add react-native-safe-popover react-native-gesture-handler react-native-safe-area-context
 # or
-npm install --save react-native-safe-popover
+npm install --save react-native-safe-popover react-native-gesture-handler react-native-safe-area-context
+
+# After installing via yarn/npm, also run this to install any iOS native dependencies:
+npx pod-install
 ```
 
 ## Appearance
@@ -78,7 +81,7 @@ These screenshots come from the real-world iOS app, [LinguaBrowse](https://itune
 * As this is an imitation of [UIPopoverPresentationController](https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller), the APIs are generally modelled on those of it.
 * SafePopover is nested within a full-screen modal, and so will have access to the entire screen area regardless of where you place it into the view hierarchy.
 * When SafePopover appears, it appears over a backdrop, which by default is `rgba(0,0,0,0.25)` (as configured by the `backdropColor` prop), but you could make it totally transparent if preferred.
-* It supports the props exposed in `src/Popover.tsx` by the interface `PopoverProps`; read those for full details on how you can configure SafePopover.
+* It supports the props exposed in [src/Popover.tsx](/src/Popover.tsx) by the interface `PopoverProps`; read those for full details on how you can configure SafePopover.
 * You can specify the preferred size for the popover content via the `preferredWidth` and `preferredHeight` props. You can think of these as equivalent to `maxWidth` and `maxHeight` in CSS.
 * Given a source rectangle to "pop" out of, it calculates the optimal position to place the popover content, and thus also the orientation for the arrow.
 * Through the `permittedArrowDirections` prop, you can specify your order of preference for the orientation of the arrow, and thus the placement of the popover content. You can force the content to always be placed above the rectangle by specifying `permittedArrowDirections={[PopoverArrowDirection.down]}`.
