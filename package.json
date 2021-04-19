@@ -9,6 +9,9 @@
   "files": [
     "src",
     "lib",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
     "android",
     "ios",
     "react-native-safe-popover.podspec"
@@ -38,7 +41,6 @@
   "homepage": "https://github.com/shirakaba/react-native-safe-popover#readme",
   "devDependencies": {
     "@commitlint/config-conventional": "^11.0.0",
-    "react-native-builder-bob": "^0.18.1",
     "@react-native-community/eslint-config": "^2.0.0",
     "@release-it/conventional-changelog": "^1.1.0",
     "@types/jest": "^25.1.2",
@@ -51,6 +53,7 @@
     "prettier": "^2.2.1",
     "react": "17.0.1",
     "react-native": "0.64.0",
+    "react-native-builder-bob": "^0.18.1",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-safe-area-context": "^3.2.0",
     "release-it": "^12.6.3",
@@ -105,5 +108,14 @@
       "typescript"
     ]
   },
-  "dependencies": {}
+  "dependencies": {},
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  }
 }
