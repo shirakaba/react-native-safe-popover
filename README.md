@@ -5,12 +5,24 @@ A faithful JS-only imitation of UIKit's UIPopoverPresentationController, which r
 ## Installation
 
 ```sh
-npm install react-native-safe-popover
-# or
 yarn add react-native-safe-popover
+# or
+npm install --save react-native-safe-popover
 ```
 
 ## Appearance
+
+These screenshots come from the included demo.
+
+On the "happy path", the popover will simply fill the available space and attain its preferred size (see the screenshots below, where we've tapped on the "bottom" and "right" source rectangles).
+
+When the source rectangle is close to the edge, the safe area and layout margins become relevant.
+
+The arrow and popover content will strictly keep to within the safe area. You will notice in the "top-left" case, however, that the arrow doesn't quite line up with the source rectangle despite there being no unsafe area to avoid on the left side. This is because the popover additionally respects the `popoverMinimumLayoutMargins` property (modelled on UIPopoverPresentationController's [popoverLayoutMargins](https://developer.apple.com/documentation/uikit/uipopoverpresentationcontroller/1622323-popoverlayoutmargins?language=objc) property). By default, this is a margin of 10px on all sides. This simply prevents the popover from being positioned flush with the screen edge – it's prettier (according to Apple) to be able to see a gutter.
+
+The arrow that points out of the content box will also not disjoint from the content box. It gets as close to the source rectangle as it can, but won't necessarily touch it, which again is exhibited in the "top-left" case.
+
+So in summary, the whole popover stays within the safe area (and also within the `popoverMinimumLayoutMargins`), and will place itself as close to the source rectangle as possible whilst doing so.
 
 <table>
     <tbody>
@@ -85,3 +97,11 @@ export function Example(targetRect: { x: number, y: number, height: number, widt
 ## License
 
 MIT
+
+## More of my stuff
+
+<img src="/github/LinguaBrowse.PNG" width="64px"</img>
+
+* [LinguaBrowse](https://itunes.apple.com/us/app/linguabrowse/id1281350165?ls=1&mt=8) (iOS) on the App Store – made in React Native + TypeScript
+* [LinguaBrowse](https://itunes.apple.com/gb/app/linguabrowse/id1422884180?mt=12) (macOS Safari Extension) on the App Store – made in Swift + TypeScript
+* [@LinguaBrowse](https://twitter.com/LinguaBrowse) – my Twitter account. I talk about NativeScript, React Native, TypeScript, Chinese, Japanese, and my apps on there.
