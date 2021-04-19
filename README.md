@@ -44,7 +44,7 @@ The arrow that points out of the content box will also not disjoint from the con
 
 So in summary, the whole popover stays within the safe area (and also within the `popoverMinimumLayoutMargins`), and will place itself as close to the source rectangle as possible whilst doing so.
 
-<table>
+<table align="center">
     <tbody>
         <tr>
             <td align="center" valign="middle">
@@ -73,7 +73,7 @@ So in summary, the whole popover stays within the safe area (and also within the
 
 These screenshots come from the real-world iOS app, [LinguaBrowse](https://itunes.apple.com/us/app/linguabrowse/id1281350165?ls=1&mt=8), and demonstrate how it seamlessly handles `<WebView>` (or equally `<ScrollView>`) components:
 
-<table>
+<table align="center">
     <tbody>
         <tr>
             <td align="center" valign="middle">
